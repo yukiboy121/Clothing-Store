@@ -1,0 +1,388 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { useCartStore } from "@/store/cart";
+import { ProductCard } from "@/components/ProductCard";
+
+interface Product {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  comparePrice: number | null;
+  images: string[];
+  colors: { name: string; hex: string }[];
+  sizes: string[];
+  isLimitedDrop: boolean;
+  dropEndsAt: Date | null;
+  inStock: boolean;
+  stockCount: number;
+  category: string;
+}
+
+function CountdownTimer({ endsAt }: { endsAt: Date }) {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const update = () => {
+      const now = new Date().getTime();
+      const end = new Date(endsAt).getTime();
+      const diff = Math.max(0, end - now);
+
+      setTimeLeft({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((diff % (1000 * 60)) / 1000),
+      });
+    };
+
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [endsAt]);
+
+  return (
+    <div className="flex gap-4">
+      {Object.entries(timeLeft).map(([unit, value]) => (
+        <div key={unit} className="text-center">
+          <div className="font-heading text-2xl md:text-3xl tracking-wider">{String(value).padStart(2, "0")}</div>
+          <div className="text-[9px] text-white/30 tracking-[0.2em] mt-1">{unit.toUpperCase()}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function ProductDetail({ product, recommended }: { product: Product; recommended: Product[] }) {
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedColor, setSelectedColor] = useState(0);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const addItem = useCartStore((s) => s.addItem);
+
+  const handleAddToCart = () => {
+    if (!selectedSize) return;
+    addItem({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.images[0],
+      size: selectedSize,
+      color: product.colors[selectedColor]?.name || "Default",
+      quantity,
+      slug: product.slug,
+    });
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setMousePos({ x, y });
+  };
+
+  return (
+    <div className="pt-24 md:pt-32">
+      <div className="max-w-[1800px] mx-auto px-6 md:px-10">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-16">
+          {/* Images */}
+          <div className="space-y-3">
+            {/* Main Image */}
+            <motion.div
+              className="relative aspect-[3/4] bg-abyss overflow-hidden cursor-crosshair"
+              onClick={() => setZoomed(!zoomed)}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={() => setZoomed(false)}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedImage}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="relative w-full h-full"
+                >
+                  <Image
+                    src={product.images[selectedImage]}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-300"
+                    style={
+                      zoomed
+                        ? {
+                            transform: "scale(2)",
+                            transformOrigin: `${mousePos.x}% ${mousePos.y}%`,
+                          }
+                        : undefined
+                    }
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority
+                  />
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Badges */}
+              <div className="absolute top-4 left-4 flex flex-col gap-2">
+                {product.isLimitedDrop && (
+                  <span className="bg-white text-void text-[9px] font-bold tracking-[0.15em] px-3 py-1.5">
+                    LIMITED DROP
+                  </span>
+                )}
+                {product.comparePrice && (
+                  <span className="bg-red-600 text-white text-[9px] font-bold tracking-[0.15em] px-3 py-1.5">
+                    SALE
+                  </span>
+                )}
+              </div>
+            </motion.div>
+
+            {/* Thumbnails */}
+            <div className="flex gap-3">
+              {product.images.map((img, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSelectedImage(i)}
+                  className={`relative aspect-square w-20 md:w-24 bg-abyss overflow-hidden transition-all duration-300 ${
+                    selectedImage === i ? "ring-1 ring-white" : "opacity-50 hover:opacity-80"
+                  }`}
+                >
+                  <Image src={img} alt={`${product.name} ${i + 1}`} fill className="object-cover" sizes="96px" />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Product Info - Sticky */}
+          <div className="md:sticky md:top-32 md:self-start space-y-8">
+            <div>
+              <p className="text-[10px] tracking-[0.3em] text-white/30 mb-3">{product.category.toUpperCase()}</p>
+              <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl tracking-wider">{product.name}</h1>
+              <div className="flex items-center gap-3 mt-4">
+                <span className="text-xl md:text-2xl">${product.price.toFixed(2)}</span>
+                {product.comparePrice && (
+                  <span className="text-base text-white/30 line-through">${product.comparePrice.toFixed(2)}</span>
+                )}
+                {product.comparePrice && (
+                  <span className="text-[10px] bg-red-600/20 text-red-400 px-2 py-1 tracking-wider">
+                    SAVE ${(product.comparePrice - product.price).toFixed(0)}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Countdown */}
+            {product.isLimitedDrop && product.dropEndsAt && (
+              <div className="p-5 border border-white/10">
+                <p className="text-[10px] tracking-[0.2em] text-white/40 mb-3">DROP ENDS IN</p>
+                <CountdownTimer endsAt={product.dropEndsAt} />
+                {product.stockCount <= 50 && (
+                  <p className="text-[10px] text-red-400 mt-3 tracking-wider pulse-glow">
+                    ONLY {product.stockCount} LEFT
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Color Selection */}
+            {product.colors.length > 0 && (
+              <div>
+                <p className="text-[10px] tracking-[0.2em] text-white/40 mb-3">
+                  COLOR — {product.colors[selectedColor]?.name}
+                </p>
+                <div className="flex gap-3">
+                  {product.colors.map((color, i) => (
+                    <button
+                      key={color.name}
+                      onClick={() => setSelectedColor(i)}
+                      className={`w-8 h-8 rounded-full border-2 transition-all ${
+                        selectedColor === i ? "border-white scale-110" : "border-white/10 hover:border-white/30"
+                      }`}
+                      style={{ backgroundColor: color.hex }}
+                      title={color.name}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Size Selection */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[10px] tracking-[0.2em] text-white/40">
+                  SIZE {selectedSize ? `— ${selectedSize}` : ""}
+                </p>
+                <button
+                  onClick={() => setShowSizeGuide(true)}
+                  className="text-[10px] tracking-[0.15em] text-white/40 underline underline-offset-4 hover:text-white/60 transition-colors"
+                >
+                  SIZE GUIDE
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {product.sizes.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`px-5 py-3 text-xs tracking-[0.15em] border transition-all duration-300 ${
+                      selectedSize === size
+                        ? "bg-white text-void border-white"
+                        : "border-white/10 text-white/60 hover:border-white/30"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Quantity */}
+            <div>
+              <p className="text-[10px] tracking-[0.2em] text-white/40 mb-3">QUANTITY</p>
+              <div className="flex items-center border border-white/10 w-fit">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-12 h-12 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                >
+                  −
+                </button>
+                <span className="w-12 h-12 flex items-center justify-center text-sm border-x border-white/10">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="w-12 h-12 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Add to Cart */}
+            <div className="space-y-3">
+              <motion.button
+                onClick={handleAddToCart}
+                disabled={!selectedSize}
+                whileTap={{ scale: 0.98 }}
+                className={`w-full py-5 font-heading text-sm tracking-[0.2em] transition-all duration-300 ${
+                  addedToCart
+                    ? "bg-green-600 text-white"
+                    : selectedSize
+                    ? "bg-white text-void hover:bg-silver"
+                    : "bg-white/10 text-white/30 cursor-not-allowed"
+                }`}
+              >
+                {addedToCart ? "✓ ADDED TO BAG" : selectedSize ? "ADD TO BAG" : "SELECT A SIZE"}
+              </motion.button>
+            </div>
+
+            {/* Description */}
+            <div className="pt-6 border-t border-white/5">
+              <p className="text-sm text-white/50 leading-relaxed">{product.description}</p>
+            </div>
+
+            {/* Features */}
+            <div className="space-y-3 pt-4">
+              {[
+                "Free shipping on orders over $250",
+                "14-day returns policy",
+                "Premium packaging",
+                "Worldwide delivery",
+              ].map((feature) => (
+                <div key={feature} className="flex items-center gap-3">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/30">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span className="text-xs text-white/40">{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Recommended Products */}
+        {recommended.length > 0 && (
+          <div className="mt-20 md:mt-32 pb-20">
+            <h2 className="font-heading text-2xl md:text-4xl tracking-wider mb-10">YOU MAY ALSO LIKE</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {recommended.map((p, i) => (
+                <ProductCard key={p.id} product={p} index={i} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Size Guide Modal */}
+      <AnimatePresence>
+        {showSizeGuide && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowSizeGuide(false)}
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-abyss border border-white/10 p-8 max-w-lg w-full"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-heading text-xl tracking-wider">SIZE GUIDE</h3>
+                <button onClick={() => setShowSizeGuide(false)} className="text-white/60 hover:text-white">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-white/10">
+                      <th className="text-left py-3 text-white/40 tracking-wider">SIZE</th>
+                      <th className="text-left py-3 text-white/40 tracking-wider">CHEST</th>
+                      <th className="text-left py-3 text-white/40 tracking-wider">LENGTH</th>
+                      <th className="text-left py-3 text-white/40 tracking-wider">SHOULDER</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-white/60">
+                    {[
+                      { size: "S", chest: "106cm", length: "72cm", shoulder: "52cm" },
+                      { size: "M", chest: "112cm", length: "74cm", shoulder: "54cm" },
+                      { size: "L", chest: "118cm", length: "76cm", shoulder: "56cm" },
+                      { size: "XL", chest: "124cm", length: "78cm", shoulder: "58cm" },
+                      { size: "XXL", chest: "130cm", length: "80cm", shoulder: "60cm" },
+                    ].map((row) => (
+                      <tr key={row.size} className="border-b border-white/5">
+                        <td className="py-3 font-medium">{row.size}</td>
+                        <td className="py-3">{row.chest}</td>
+                        <td className="py-3">{row.length}</td>
+                        <td className="py-3">{row.shoulder}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-[10px] text-white/30 mt-4">
+                All measurements are approximate. Our pieces are designed with an oversized fit.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
