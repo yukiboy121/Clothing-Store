@@ -4,19 +4,19 @@ import { motion } from "framer-motion";
 
 const testimonials = [
   {
-    quote: "Best quality streetwear I've ever owned. The heavyweight cotton is insane.",
-    author: "Jake M.",
-    location: "Sydney, AU",
+    quote: "Very fast delivery and the embroidery is perfect.",
+    author: "Amila Silva",
+    location: "Custom Hoodie",
   },
   {
-    quote: "Finally a brand that gets it. Underground aesthetic, premium quality. Nothing else like it.",
-    author: "Marcus T.",
-    location: "Melbourne, AU",
+    quote: "Quality of the material is superb. Best sportswear in SL!",
+    author: "Kasun Perera",
+    location: "Performance T-Shirt",
   },
   {
-    quote: "Copped the Nocturnal Hoodie and it's my favorite piece ever. 10/10.",
-    author: "Liam R.",
-    location: "London, UK",
+    quote: "The fit is amazing. Highly recommend Dragon Group.",
+    author: "Nimali Fonseka",
+    location: "Active Shorts",
   },
 ];
 
@@ -42,21 +42,26 @@ export function TestimonialsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ delay: i * 0.1, duration: 0.6 }}
-            className="border border-white/5 p-8 md:p-10 hover:border-white/10 transition-colors duration-500"
+            className="bg-[#0f111a] border border-[#00b4d8] rounded-3xl p-8 md:p-10 flex flex-col items-center text-center transition-transform hover:-translate-y-2 duration-500 shadow-xl"
           >
+            <img 
+              src="https://dragongrouplk.com/wp-content/uploads/2026/05/lVuQD-removebg-preview.png" 
+              alt="Dragon Logo" 
+              className="h-10 mb-4 object-contain opacity-60" 
+            />
             <div className="flex gap-1 mb-6">
               {Array.from({ length: 5 }).map((_, j) => (
-                <svg key={j} width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-white/40">
+                <svg key={j} width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-[#fca311]">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
               ))}
             </div>
-            <p className="text-sm md:text-base text-white/60 leading-relaxed mb-8">
-              &ldquo;{t.quote}&rdquo;
+            <p className="text-sm md:text-base font-medium text-white/90 leading-relaxed mb-8 max-w-[250px]">
+              "{t.quote}"
             </p>
-            <div>
-              <p className="text-xs font-medium tracking-wider">{t.author}</p>
-              <p className="text-[10px] text-white/30 mt-1">{t.location}</p>
+            <div className="mt-auto">
+              <p className="text-sm font-bold tracking-wide text-white">{t.author}</p>
+              <p className="text-xs text-white/70 mt-1">{t.location}</p>
             </div>
           </motion.div>
         ))}
