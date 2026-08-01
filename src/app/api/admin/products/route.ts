@@ -4,6 +4,21 @@ import { db } from "@/db";
 import { products } from "@/db/schema";
 import { verifyAdminSession } from "@/lib/auth";
 
+export async function GET(req: Request) {
+  try {
+    const isAdmin = await verifyAdminSession();
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
+    }
+
+    const allProducts = await db.select().from(products).orderBy(products.createdAt);
+    return NextResponse.json({ success: true, products: allProducts });
+  } catch (error: any) {
+    console.error("Failed to fetch products:", error);
+    return NextResponse.json({ error: "Failed to fetch products." }, { status: 500 });
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const isAdmin = await verifyAdminSession();

@@ -43,6 +43,15 @@ interface Coupon {
   isActive: boolean;
 }
 
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  category: string;
+  inStock: boolean;
+  stockCount: number;
+}
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const { user, isLoading } = useAuthStore();
@@ -63,6 +72,8 @@ export default function AdminDashboardPage() {
   const [newCoupon, setNewCoupon] = useState({ code: "", type: "percent", value: "", minAmount: "0" });
 
   // State for Products
+  const [productsList, setProductsList] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
   const [newProduct, setNewProduct] = useState({
     name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies",
     imageUrls: "", stockCount: "100"
@@ -85,6 +96,7 @@ export default function AdminDashboardPage() {
     }
     if (activeTab === "settings" && usersList.length === 0) fetchUsers();
     if (activeTab === "coupons" && couponsList.length === 0) fetchCoupons();
+    if (activeTab === "products" && productsList.length === 0) fetchProducts();
   }, [activeTab]);
 
   // --- LOGIC FUNCTIONS (Orders, Users, Coupons, Products) ---
@@ -190,6 +202,19 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const fetchProducts = async () => {
+    setLoadingProducts(true);
+    try {
+      const res = await fetch("/api/admin/products");
+      const data = await res.json();
+      if (data.products) setProductsList(data.products);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingProduct(true);
@@ -208,6 +233,7 @@ export default function AdminDashboardPage() {
       const data = await res.json();
       if (res.ok) {
         alert("Product Added Successfully!");
+        setProductsList([...productsList, data.product]);
         setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100" });
       } else {
         alert(data.error);
@@ -386,7 +412,8 @@ export default function AdminDashboardPage() {
 
           {/* TAB: PRODUCTS */}
           {activeTab === "products" && (
-            <div className="bg-neutral-900/40 border border-white/5 p-6 md:p-8 rounded-2xl max-w-3xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <>
+            <div className="bg-neutral-900/40 border border-white/5 p-6 md:p-8 rounded-2xl max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-500">
               <h2 className="text-xs font-semibold uppercase tracking-widest text-white/70 mb-8">Add to Catalog</h2>
               <form onSubmit={handleAddProduct} className="space-y-5 text-sm">
                 <div className="grid grid-cols-2 gap-5">
@@ -436,6 +463,51 @@ export default function AdminDashboardPage() {
                 </button>
               </form>
             </div>
+
+            <div className="bg-neutral-900/40 border border-white/5 p-6 md:p-8 rounded-2xl max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-500 mt-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xs font-semibold uppercase tracking-widest text-white/70">Current Products</h2>
+                <button onClick={fetchProducts} className="text-[10px] uppercase tracking-widest text-white/50 hover:text-white transition-colors flex items-center gap-2">
+                  Refresh
+                </button>
+              </div>
+
+              {loadingProducts ? (
+                <div className="py-12 text-center text-xs text-white/50">Loading products...</div>
+              ) : productsList.length === 0 ? (
+                <div className="py-12 text-center text-sm text-white/50">No products found.</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
+                    <thead>
+                      <tr className="border-b border-white/5 text-white/40 uppercase text-[9px] tracking-[0.2em]">
+                        <th className="py-4 px-4 font-semibold">Name</th>
+                        <th className="py-4 px-4 font-semibold">Category</th>
+                        <th className="py-4 px-4 font-semibold">Price</th>
+                        <th className="py-4 px-4 font-semibold">Stock</th>
+                        <th className="py-4 px-4 font-semibold">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {productsList.map((prod) => (
+                        <tr key={prod.id} className="hover:bg-white/5 transition-colors">
+                          <td className="py-4 px-4 font-bold text-white">{prod.name}</td>
+                          <td className="py-4 px-4">{prod.category}</td>
+                          <td className="py-4 px-4 text-emerald-400 font-semibold">Rs. {prod.price.toLocaleString()}</td>
+                          <td className="py-4 px-4">{prod.stockCount}</td>
+                          <td className="py-4 px-4">
+                            <span className={`px-2 py-1 rounded text-[9px] uppercase tracking-wider font-bold ${prod.inStock ? 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20' : 'bg-red-400/10 text-red-400'}`}>
+                              {prod.inStock ? 'In Stock' : 'Out of Stock'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+            </>
           )}
 
           {/* TAB: COUPONS */}
