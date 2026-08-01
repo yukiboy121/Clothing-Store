@@ -87,7 +87,7 @@ export default function AdminDashboardPage() {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [newProduct, setNewProduct] = useState({
     name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies",
-    imageUrls: "", stockCount: "100"
+    imageUrls: "", stockCount: "100", colors: "", sizes: ""
   });
   const [savingProduct, setSavingProduct] = useState(false);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
@@ -295,10 +295,25 @@ export default function AdminDashboardPage() {
     setSavingProduct(true);
     try {
       const imagesArray = newProduct.imageUrls.split(",").map((url) => url.trim()).filter(Boolean);
+      
+      const colorMap: Record<string, string> = {
+        "black": "#000000", "white": "#ffffff", "red": "#ff0000", "blue": "#0000ff", "navy": "#000080",
+        "green": "#008000", "gray": "#808080", "grey": "#808080", "pink": "#ffc0cb", "yellow": "#ffff00",
+        "orange": "#ffa500", "purple": "#800080", "brown": "#a52a2a", "beige": "#f5f5dc", "cream": "#fffdd0"
+      };
+      const parsedColors = newProduct.colors ? newProduct.colors.split(",").map(c => {
+        const name = c.trim();
+        return { name, hex: colorMap[name.toLowerCase()] || "#333333" };
+      }).filter(c => c.name) : [];
+      
+      const parsedSizes = newProduct.sizes ? newProduct.sizes.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) : [];
+
       const body = {
         ...newProduct,
         id: editingProductId,
         images: imagesArray.length > 0 ? imagesArray : ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800"],
+        colors: parsedColors,
+        sizes: parsedSizes,
       };
 
       const method = editingProductId ? "PATCH" : "POST";
@@ -315,7 +330,7 @@ export default function AdminDashboardPage() {
         } else {
           setProductsList([...productsList, data.product]);
         }
-        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100" });
+        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: "", sizes: "" });
         setEditingProductId(null);
       } else {
         alert(data.error);
@@ -539,6 +554,17 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-2 gap-5">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Colors (Comma separated)</label>
+                    <input type="text" value={newProduct.colors} onChange={(e) => setNewProduct({...newProduct, colors: e.target.value})} className="w-full bg-black/40 border border-white/10 px-4 py-3 rounded-xl focus:border-white/40 outline-none transition-colors" placeholder="e.g. Black, White, Red" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Sizes (Comma separated)</label>
+                    <input type="text" value={newProduct.sizes} onChange={(e) => setNewProduct({...newProduct, sizes: e.target.value})} className="w-full bg-black/40 border border-white/10 px-4 py-3 rounded-xl focus:border-white/40 outline-none transition-colors" placeholder="e.g. S, M, L, XL" />
+                  </div>
+                </div>
+
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Image URLs or Upload</label>
                   <div className="flex flex-col gap-3">
@@ -566,7 +592,7 @@ export default function AdminDashboardPage() {
                       type="button" 
                       onClick={() => {
                         setEditingProductId(null);
-                        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100" });
+                        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: "", sizes: "" });
                       }}
                       className="px-8 py-4 bg-white/5 border border-white/10 text-white font-bold uppercase text-xs tracking-[0.2em] rounded-xl hover:bg-white/10 transition-colors"
                     >
@@ -626,7 +652,9 @@ export default function AdminDashboardPage() {
                                   comparePrice: (prod as any).comparePrice?.toString() || "",
                                   category: prod.category,
                                   imageUrls: (prod as any).images?.join(", ") || "",
-                                  stockCount: prod.stockCount.toString()
+                                  stockCount: prod.stockCount.toString(),
+                                  colors: (prod as any).colors?.map((c: any) => c.name).join(", ") || "",
+                                  sizes: (prod as any).sizes?.join(", ") || ""
                                 });
                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                               }}
