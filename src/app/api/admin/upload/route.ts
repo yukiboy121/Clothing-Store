@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import { verifyAdminSession } from "@/lib/auth";
-import fs from "fs/promises";
-import path from "path";
 
 export async function POST(req: Request) {
   try {
@@ -19,23 +17,13 @@ export async function POST(req: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     
-    // Create a safe, unique filename
-    const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-    const uploadDir = path.join(process.cwd(), "public/uploads");
-    
-    // Ensure the uploads directory exists
-    try {
-      await fs.access(uploadDir);
-    } catch {
-      await fs.mkdir(uploadDir, { recursive: true });
-    }
+    // Convert to Base64
+    const base64String = buffer.toString("base64");
+    const mimeType = file.type || "image/jpeg";
+    const dataUri = `data:${mimeType};base64,${base64String}`;
 
-    const filePath = path.join(uploadDir, filename);
-    await fs.writeFile(filePath, buffer);
-
-    const publicUrl = `/uploads/${filename}`;
-
-    return NextResponse.json({ success: true, url: publicUrl });
+    // Return the Base64 Data URI instead of saving to a file
+    return NextResponse.json({ success: true, url: dataUri });
   } catch (error: any) {
     console.error("Upload error:", error);
     return NextResponse.json({ error: "Failed to upload file." }, { status: 500 });

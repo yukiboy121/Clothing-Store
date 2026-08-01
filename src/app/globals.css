@@ -70,11 +70,11 @@ body {
 }
 
 .liquid-glass {
-  background: rgba(5, 5, 5, 0.4);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  background: rgba(10, 10, 10, 0.45);
+  backdrop-filter: blur(24px) saturate(250%);
+  -webkit-backdrop-filter: blur(24px) saturate(250%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 }
 
 @keyframes marquee {
