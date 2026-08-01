@@ -87,13 +87,22 @@ export default function AdminDashboardPage() {
   // State for Products
   const [productsList, setProductsList] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
-  const [newProduct, setNewProduct] = useState({
+  const [newProduct, setNewProduct] = useState<{
+    name: string; slug: string; description: string; price: string; comparePrice: string;
+    category: string; imageUrls: string; stockCount: string;
+    colors: { name: string; hex: string }[];
+    sizes: string[];
+    tags: string[];
+    isLimitedDrop: boolean;
+  }>({
     name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies",
-    imageUrls: "", stockCount: "100", colors: "", sizes: "", tags: "", isLimitedDrop: false
+    imageUrls: "", stockCount: "100", colors: [], sizes: [], tags: [], isLimitedDrop: false
   });
   const [savingProduct, setSavingProduct] = useState(false);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [customColorName, setCustomColorName] = useState("");
+  const [customColorHex, setCustomColorHex] = useState("#ffffff");
 
   // State for Reviews
   const [reviewsList, setReviewsList] = useState<Review[]>([]);
@@ -296,28 +305,13 @@ export default function AdminDashboardPage() {
     e.preventDefault();
     setSavingProduct(true);
     try {
-      const imagesArray = newProduct.imageUrls.split(",").map((url) => url.trim()).filter(Boolean);
-      
-      const colorMap: Record<string, string> = {
-        "black": "#000000", "white": "#ffffff", "red": "#ff0000", "blue": "#0000ff", "navy": "#000080",
-        "green": "#008000", "gray": "#808080", "grey": "#808080", "pink": "#ffc0cb", "yellow": "#ffff00",
-        "orange": "#ffa500", "purple": "#800080", "brown": "#a52a2a", "beige": "#f5f5dc", "cream": "#fffdd0"
-      };
-      const parsedColors = newProduct.colors ? newProduct.colors.split(",").map(c => {
-        const name = c.trim();
-        return { name, hex: colorMap[name.toLowerCase()] || "#333333" };
-      }).filter(c => c.name) : [];
-      
-      const parsedSizes = newProduct.sizes ? newProduct.sizes.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) : [];
-      const parsedTags = newProduct.tags ? newProduct.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
-
       const body = {
         ...newProduct,
         id: editingProductId,
-        images: imagesArray.length > 0 ? imagesArray : ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800"],
-        colors: parsedColors,
-        sizes: parsedSizes,
-        tags: parsedTags,
+        images: newProduct.imageUrls.length > 0 ? newProduct.imageUrls : ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800"],
+        colors: newProduct.colors,
+        sizes: newProduct.sizes,
+        tags: newProduct.tags,
       };
 
       const method = editingProductId ? "PATCH" : "POST";
@@ -334,7 +328,9 @@ export default function AdminDashboardPage() {
         } else {
           setProductsList([...productsList, data.product]);
         }
-        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: "", sizes: "", tags: "", isLimitedDrop: false });
+        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: [], sizes: [], tags: [], isLimitedDrop: false });
+        setCustomColorName("");
+        setCustomColorHex("#ffffff");
         setEditingProductId(null);
       } else {
         alert(data.error);
@@ -562,15 +558,134 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-5">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Colors (Comma separated)</label>
-                    <input type="text" value={newProduct.colors} onChange={(e) => setNewProduct({...newProduct, colors: e.target.value})} className="w-full bg-black/40 border border-white/10 px-4 py-3 rounded-xl focus:border-white/40 outline-none transition-colors" placeholder="e.g. Black, White, Red" />
+                {/* ===================== SIZES - Chip Selector ===================== */}
+                <div className="space-y-3">
+                  <label className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Sizes</label>
+                  <div className="flex flex-wrap gap-2">
+                    {["S","M","L","XL","2XL","3XL","4XL","5XL"].map(size => {
+                      const selected = newProduct.sizes.includes(size);
+                      return (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => setNewProduct(prev => ({
+                            ...prev,
+                            sizes: selected
+                              ? prev.sizes.filter(s => s !== size)
+                              : [...prev.sizes, size]
+                          }))}
+                          className={`px-5 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-widest transition-all duration-200 ${
+                            selected
+                              ? "bg-white text-black border-white shadow-[0_0_12px_rgba(255,255,255,0.25)]"
+                              : "bg-black/40 border-white/10 text-white/50 hover:border-white/30 hover:text-white"
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      );
+                    })}
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Sizes (Comma separated)</label>
-                    <input type="text" value={newProduct.sizes} onChange={(e) => setNewProduct({...newProduct, sizes: e.target.value})} className="w-full bg-black/40 border border-white/10 px-4 py-3 rounded-xl focus:border-white/40 outline-none transition-colors" placeholder="e.g. S, M, L, XL" />
+                  {newProduct.sizes.length > 0 && (
+                    <p className="text-[10px] text-white/30 tracking-wider">Selected: {newProduct.sizes.join(", ")}</p>
+                  )}
+                </div>
+
+                {/* ===================== COLORS - Chip Selector + Custom Color ===================== */}
+                <div className="space-y-3">
+                  <label className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Colors</label>
+                  {/* Preset color chips */}
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { name: "Black", hex: "#000000" },
+                      { name: "White", hex: "#ffffff" },
+                      { name: "Red", hex: "#ff0000" },
+                      { name: "Blue", hex: "#0000ff" },
+                      { name: "Navy", hex: "#000080" },
+                      { name: "Green", hex: "#008000" },
+                      { name: "Gray", hex: "#808080" },
+                      { name: "Pink", hex: "#ffc0cb" },
+                      { name: "Yellow", hex: "#facc15" },
+                      { name: "Orange", hex: "#f97316" },
+                      { name: "Purple", hex: "#7c3aed" },
+                      { name: "Brown", hex: "#a52a2a" },
+                      { name: "Beige", hex: "#f5f5dc" },
+                      { name: "Cream", hex: "#fffdd0" },
+                    ].map(color => {
+                      const selected = newProduct.colors.some(c => c.name === color.name);
+                      return (
+                        <button
+                          key={color.name}
+                          type="button"
+                          title={color.name}
+                          onClick={() => setNewProduct(prev => ({
+                            ...prev,
+                            colors: selected
+                              ? prev.colors.filter(c => c.name !== color.name)
+                              : [...prev.colors, color]
+                          }))}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-[10px] font-bold uppercase tracking-widest transition-all duration-200 ${
+                            selected
+                              ? "border-white/60 bg-white/10 text-white shadow-[0_0_10px_rgba(255,255,255,0.1)]"
+                              : "border-white/10 text-white/40 hover:border-white/20 hover:text-white/70"
+                          }`}
+                        >
+                          <span
+                            className="w-4 h-4 rounded-full border border-white/20 shrink-0"
+                            style={{ backgroundColor: color.hex }}
+                          />
+                          {color.name}
+                        </button>
+                      );
+                    })}
                   </div>
+                  {/* Custom color picker */}
+                  <div className="flex items-end gap-3 p-4 bg-white/5 border border-white/10 rounded-xl">
+                    <div className="space-y-1.5 flex-1">
+                      <label className="text-[10px] font-semibold uppercase tracking-widest text-white/40">Custom Color Name</label>
+                      <input
+                        type="text"
+                        value={customColorName}
+                        onChange={e => setCustomColorName(e.target.value)}
+                        placeholder="e.g. Forest Green"
+                        className="w-full bg-black/40 border border-white/10 px-4 py-2.5 rounded-xl focus:border-white/40 outline-none transition-colors text-sm"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-semibold uppercase tracking-widest text-white/40">Pick Color</label>
+                      <input
+                        type="color"
+                        value={customColorHex}
+                        onChange={e => setCustomColorHex(e.target.value)}
+                        className="w-14 h-11 rounded-xl border border-white/10 cursor-pointer bg-transparent"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const name = customColorName.trim();
+                        if (!name) return;
+                        if (newProduct.colors.some(c => c.name.toLowerCase() === name.toLowerCase())) return;
+                        setNewProduct(prev => ({ ...prev, colors: [...prev.colors, { name, hex: customColorHex }] }));
+                        setCustomColorName("");
+                        setCustomColorHex("#ffffff");
+                      }}
+                      className="px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
+                    >
+                      + Add
+                    </button>
+                  </div>
+                  {/* Selected colors display */}
+                  {newProduct.colors.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {newProduct.colors.map(c => (
+                        <div key={c.name} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-xs">
+                          <span className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: c.hex }} />
+                          <span>{c.name}</span>
+                          <button type="button" onClick={() => setNewProduct(prev => ({ ...prev, colors: prev.colors.filter(col => col.name !== c.name) }))} className="text-white/30 hover:text-white ml-1">×</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-1.5">
@@ -591,9 +706,36 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Tags (Comma separated)</label>
-                  <input type="text" value={newProduct.tags} onChange={(e) => setNewProduct({...newProduct, tags: e.target.value})} className="w-full bg-black/40 border border-white/10 px-4 py-3 rounded-xl focus:border-white/40 outline-none transition-colors" placeholder="e.g. Latest Drop, Limited Edition, New" />
+                {/* ===================== TAGS - Chip Selector ===================== */}
+                <div className="space-y-3">
+                  <label className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Tags</label>
+                  <div className="flex flex-wrap gap-2">
+                    {["Latest Drop","Limited Edition","New Arrival","Best Seller","Sale","Featured","Restocked","Trending","Exclusive","Collab"].map(tag => {
+                      const selected = newProduct.tags.includes(tag);
+                      return (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => setNewProduct(prev => ({
+                            ...prev,
+                            tags: selected
+                              ? prev.tags.filter(t => t !== tag)
+                              : [...prev.tags, tag]
+                          }))}
+                          className={`px-4 py-2 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all duration-200 ${
+                            selected
+                              ? "bg-emerald-400/20 text-emerald-400 border-emerald-400/50 shadow-[0_0_12px_rgba(52,211,153,0.2)]"
+                              : "bg-black/40 border-white/10 text-white/40 hover:border-white/20 hover:text-white/70"
+                          }`}
+                        >
+                          {tag}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {newProduct.tags.length > 0 && (
+                    <p className="text-[10px] text-emerald-400/60 tracking-wider">Selected: {newProduct.tags.join(", ")}</p>
+                  )}
                 </div>
 
                 <div className="flex gap-4 mt-4">
@@ -605,7 +747,9 @@ export default function AdminDashboardPage() {
                       type="button" 
                       onClick={() => {
                         setEditingProductId(null);
-                        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: "", sizes: "", tags: "", isLimitedDrop: false });
+                        setCustomColorName("");
+                        setCustomColorHex("#ffffff");
+                        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: [], sizes: [], tags: [], isLimitedDrop: false });
                       }}
                       className="px-8 py-4 bg-white/5 border border-white/10 text-white font-bold uppercase text-xs tracking-[0.2em] rounded-xl hover:bg-white/10 transition-colors"
                     >
@@ -666,11 +810,13 @@ export default function AdminDashboardPage() {
                                   category: prod.category,
                                   imageUrls: (prod as any).images?.join(", ") || "",
                                   stockCount: prod.stockCount.toString(),
-                                  colors: (prod as any).colors?.map((c: any) => c.name).join(", ") || "",
-                                  sizes: (prod as any).sizes?.join(", ") || "",
-                                  tags: (prod as any).tags?.join(", ") || "",
+                                  colors: (prod as any).colors || [],
+                                  sizes: (prod as any).sizes || [],
+                                  tags: (prod as any).tags || [],
                                   isLimitedDrop: (prod as any).isLimitedDrop || false
                                 });
+                                setCustomColorName("");
+                                setCustomColorHex("#ffffff");
                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                               }}
                               className="text-[10px] uppercase tracking-widest font-bold text-white/50 hover:text-white transition-colors"
