@@ -2,6 +2,7 @@
 
 import { motion, Variants } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 
 const services = [
   {
@@ -10,6 +11,7 @@ const services = [
     description: "Experience high-vibrancy Direct to Film (DTF) printing for complex designs and multi-color logos. Perfect for t-shirts, hoodies, and activewear with no minimum order quantity.",
     features: ["Vibrant Colors", "Durable Finish", "No MOQ", "Fast Turnaround"],
     action: "Get a Quote",
+    image: "https://dragongrouplk.com/wp-content/uploads/2026/05/Gemini_Generated_Image_qawt2hqawt2hqawt-1.png",
   },
   {
     category: "Customization",
@@ -17,6 +19,7 @@ const services = [
     description: "Elevate your brand with premium precision stitching. We provide high-quality embroidery for caps, polos, jackets, and corporate wear with exceptional detail.",
     features: ["High Precision", "Premium Thread", "Long Lasting", "Professional Look"],
     action: "Get a Quote",
+    image: "https://dragongrouplk.com/wp-content/uploads/2026/05/Gemini_Generated_Image_bpidikbpidikbpid-1.png",
   },
   {
     category: "Digital Presence",
@@ -24,6 +27,7 @@ const services = [
     description: "We build professional, conversion-optimized e-commerce websites tailored for your business. From hosting to payment gateway integration, we handle it all.",
     features: ["100% Responsive", "SEO Optimized", "Payment Gateway", "24/7 Support"],
     action: "Inquire Now",
+    image: "https://dragongrouplk.com/wp-content/uploads/2026/05/Gemini_Generated_Image_82qma282qma282qm-1.png",
   },
   {
     category: "Creative",
@@ -31,6 +35,7 @@ const services = [
     description: "High-end editorial and catalog photography to make your products stand out. Professional lighting and post-production included.",
     features: ["Studio Lighting", "High Res", "Editorial Style", "Fast Delivery"],
     action: "Book Session",
+    image: "https://dragongrouplk.com/wp-content/uploads/2026/05/Gemini_Generated_Image_w3lrztw3lrztw3lr-1.png",
   },
   {
     category: "Business Growth",
@@ -38,6 +43,7 @@ const services = [
     description: "Join our network of successful resellers. We provide high-quality products, reliable fulfillment, and the support you need to grow your own apparel business.",
     features: ["Wholesale Pricing", "Quality Assurance", "Bulk Discounts", "Priority Support"],
     action: "Learn More",
+    image: "https://dragongrouplk.com/wp-content/uploads/2026/05/Gemini_Generated_Image_jd9l0hjd9l0hjd9l-1.png",
   },
 ];
 
@@ -113,7 +119,15 @@ export default function ServicesPage() {
             {/* Subtle Glow on Hover */}
             <div className="absolute inset-0 bg-white/0 group-hover:bg-white/[0.02] transition-colors duration-500 pointer-events-none rounded-xl"></div>
             
-            <div className="flex-grow z-10">
+            <div className="flex-grow z-10 flex flex-col">
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-6">
+                <Image
+                  src={service.image}
+                  alt={service.title}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                />
+              </div>
               <p className="text-[10px] tracking-[0.2em] text-white/40 uppercase mb-4">
                 {service.category}
               </p>
