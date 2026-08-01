@@ -95,12 +95,12 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
   return (
     <div className="pt-24 md:pt-32">
       <div className="max-w-[1800px] mx-auto px-6 md:px-10">
-        <div className="grid md:grid-cols-2 gap-8 md:gap-16">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16">
           {/* Images */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             {/* Main Image */}
             <motion.div
-              className="relative aspect-[3/4] bg-abyss overflow-hidden cursor-crosshair"
+              className="relative aspect-square bg-[#0A0A0A] rounded-2xl md:rounded-[2rem] border border-white/5 overflow-hidden cursor-crosshair group"
               onClick={() => setZoomed(!zoomed)}
               onMouseMove={handleMouseMove}
               onMouseLeave={() => setZoomed(false)}
@@ -149,13 +149,13 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
             </motion.div>
 
             {/* Thumbnails */}
-            <div className="flex gap-3">
+            <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
               {product.images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setSelectedImage(i)}
-                  className={`relative aspect-square w-20 md:w-24 bg-abyss overflow-hidden transition-all duration-300 ${
-                    selectedImage === i ? "ring-1 ring-white" : "opacity-50 hover:opacity-80"
+                  className={`relative shrink-0 aspect-square w-20 md:w-24 bg-[#0A0A0A] rounded-xl border overflow-hidden transition-all duration-300 ${
+                    selectedImage === i ? "border-white/40 ring-1 ring-white/40" : "border-white/5 opacity-50 hover:opacity-100"
                   }`}
                 >
                   <Image src={img} alt={`${product.name} ${i + 1}`} fill className="object-cover" sizes="96px" />
