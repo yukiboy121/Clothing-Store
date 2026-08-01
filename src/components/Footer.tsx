@@ -108,7 +108,7 @@ export function Footer() {
                 </a>
               </div>
               <p className="text-[10px] text-white/20 mt-6">
-                Worldwide shipping from Melbourne, Australia
+                Worldwide shipping from Colombo, Sri Lanka
               </p>
             </div>
           </div>
