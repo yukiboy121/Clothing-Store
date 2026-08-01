@@ -12,7 +12,9 @@ import {
   LogOut, 
   PlusCircle, 
   LayoutDashboard,
-  Store
+  Store,
+  MessageSquare,
+  Star
 } from "lucide-react";
 
 interface AdminOrder {
@@ -52,6 +54,15 @@ interface Product {
   stockCount: number;
 }
 
+interface Review {
+  id: number;
+  rating: number;
+  comment: string;
+  productName: string;
+  userEmail: string;
+  createdAt: string;
+}
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const { user, isLoading } = useAuthStore();
@@ -82,6 +93,10 @@ export default function AdminDashboardPage() {
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
+  // State for Reviews
+  const [reviewsList, setReviewsList] = useState<Review[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+
   useEffect(() => {
     if (!isLoading && (!user || user.role !== "admin")) {
       router.push("/");
@@ -99,9 +114,10 @@ export default function AdminDashboardPage() {
     if (activeTab === "settings" && usersList.length === 0) fetchUsers();
     if (activeTab === "coupons" && couponsList.length === 0) fetchCoupons();
     if (activeTab === "products" && productsList.length === 0) fetchProducts();
+    if (activeTab === "reviews" && reviewsList.length === 0) fetchReviews();
   }, [activeTab]);
 
-  // --- LOGIC FUNCTIONS (Orders, Users, Coupons, Products) ---
+  // --- LOGIC FUNCTIONS (Orders, Users, Coupons, Products, Reviews) ---
   const fetchOrders = async () => {
     setLoadingOrders(true);
     try {
@@ -217,6 +233,35 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const fetchReviews = async () => {
+    setLoadingReviews(true);
+    try {
+      const res = await fetch("/api/admin/reviews");
+      const data = await res.json();
+      if (data.reviews) setReviewsList(data.reviews);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+
+  const handleDeleteReview = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this review?")) return;
+    try {
+      const res = await fetch(`/api/admin/reviews?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setReviewsList(reviewsList.filter(r => r.id !== id));
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete review");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("An error occurred");
+    }
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     setUploadingImage(true);
@@ -301,6 +346,7 @@ export default function AdminDashboardPage() {
     { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
     { id: "orders", label: "Orders", icon: <PackageSearch size={18} /> },
     { id: "products", label: "Products", icon: <PlusCircle size={18} /> },
+    { id: "reviews", label: "Reviews", icon: <MessageSquare size={18} /> },
     { id: "coupons", label: "Coupons", icon: <Tag size={18} /> },
     { id: "settings", label: "User Roles", icon: <Users size={18} /> },
   ];
@@ -656,6 +702,66 @@ export default function AdminDashboardPage() {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* TAB: REVIEWS */}
+          {activeTab === "reviews" && (
+            <div className="bg-neutral-900/40 border border-white/5 p-6 md:p-8 rounded-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xs font-semibold uppercase tracking-widest text-white/70">Customer Reviews</h2>
+                <button onClick={fetchReviews} className="text-[10px] uppercase tracking-widest text-white/50 hover:text-white transition-colors flex items-center gap-2">
+                  Refresh
+                </button>
+              </div>
+
+              {loadingReviews ? (
+                <div className="py-12 text-center text-xs text-white/50">Loading reviews...</div>
+              ) : reviewsList.length === 0 ? (
+                <div className="py-12 text-center text-sm text-white/50">No reviews found.</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-white/5 text-white/40 uppercase text-[9px] tracking-[0.2em] whitespace-nowrap">
+                        <th className="py-4 px-4 font-semibold">Date</th>
+                        <th className="py-4 px-4 font-semibold">Product</th>
+                        <th className="py-4 px-4 font-semibold">User</th>
+                        <th className="py-4 px-4 font-semibold">Rating</th>
+                        <th className="py-4 px-4 font-semibold w-1/3">Comment</th>
+                        <th className="py-4 px-4 font-semibold text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {reviewsList.map((rev) => (
+                        <tr key={rev.id} className="hover:bg-white/5 transition-colors">
+                          <td className="py-4 px-4 text-white/60 whitespace-nowrap">
+                            {new Date(rev.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="py-4 px-4 font-medium text-white whitespace-nowrap">{rev.productName}</td>
+                          <td className="py-4 px-4 text-white/60 whitespace-nowrap">{rev.userEmail}</td>
+                          <td className="py-4 px-4 whitespace-nowrap">
+                            <div className="flex text-amber-400">
+                              {[...Array(5)].map((_, i) => (
+                                <Star key={i} size={10} fill={i < rev.rating ? "currentColor" : "none"} className={i >= rev.rating ? "text-white/20" : ""} />
+                              ))}
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-white/80 min-w-[200px]">{rev.comment || "-"}</td>
+                          <td className="py-4 px-4 text-right whitespace-nowrap">
+                            <button
+                              onClick={() => handleDeleteReview(rev.id)}
+                              className="text-[10px] uppercase tracking-widest font-bold text-red-400/70 hover:text-red-400 transition-colors"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
 
