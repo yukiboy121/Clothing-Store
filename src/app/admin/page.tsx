@@ -331,7 +331,7 @@ export default function AdminDashboardPage() {
         } else {
           setProductsList([...productsList, data.product]);
         }
-        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: "", sizes: "" });
+        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: "", sizes: "", isLimitedDrop: false });
         setEditingProductId(null);
       } else {
         alert(data.error);
