@@ -68,20 +68,25 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
   const [zoomed, setZoomed] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
   const addItem = useCartStore((s) => s.addItem);
+  const openCart = useCartStore((s) => s.openCart);
 
   const handleAddToCart = () => {
-    if (!selectedSize) return;
+    if (product.sizes.length > 0 && !selectedSize) {
+      alert("Please select a size before placing the order.");
+      return;
+    }
     addItem({
       productId: product.id,
       name: product.name,
       price: product.price,
       image: product.images[0],
-      size: selectedSize,
+      size: selectedSize || "Free Size",
       color: product.colors[selectedColor]?.name || "Default",
       quantity,
       slug: product.slug,
     });
     setAddedToCart(true);
+    openCart();
     setTimeout(() => setAddedToCart(false), 2000);
   };
 
@@ -97,8 +102,9 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
       <div className="max-w-[1800px] mx-auto px-6 md:px-10">
         <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16">
           {/* Images */}
-          <div className="space-y-4">
-            {/* Main Image */}
+          <div className="w-full flex justify-center md:justify-end">
+            <div className="w-full max-w-[500px] space-y-4">
+              {/* Main Image */}
             <motion.div
               className="relative aspect-square bg-[#0A0A0A] rounded-2xl md:rounded-[2rem] border border-white/5 overflow-hidden cursor-crosshair group"
               onClick={() => setZoomed(!zoomed)}
@@ -154,13 +160,14 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
                 <button
                   key={i}
                   onClick={() => setSelectedImage(i)}
-                  className={`relative shrink-0 aspect-square w-20 md:w-24 bg-[#0A0A0A] rounded-xl border overflow-hidden transition-all duration-300 ${
+                  className={`relative shrink-0 aspect-square w-16 md:w-20 bg-[#0A0A0A] rounded-xl border overflow-hidden transition-all duration-300 ${
                     selectedImage === i ? "border-white/40 ring-1 ring-white/40" : "border-white/5 opacity-50 hover:opacity-100"
                   }`}
                 >
-                  <Image src={img} alt={`${product.name} ${i + 1}`} fill className="object-cover" sizes="96px" />
+                  <Image src={img} alt={`${product.name} ${i + 1}`} fill className="object-cover" sizes="80px" />
                 </button>
               ))}
+            </div>
             </div>
           </div>
 
@@ -218,34 +225,36 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
             )}
 
             {/* Size Selection */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-[10px] tracking-[0.2em] text-white/40">
-                  SIZE {selectedSize ? `— ${selectedSize}` : ""}
-                </p>
-                <button
-                  onClick={() => setShowSizeGuide(true)}
-                  className="text-[10px] tracking-[0.15em] text-white/40 underline underline-offset-4 hover:text-white/60 transition-colors"
-                >
-                  SIZE GUIDE
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {product.sizes.map((size) => (
+            {product.sizes.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[10px] tracking-[0.2em] text-white/40">
+                    SIZE {selectedSize ? `— ${selectedSize}` : ""}
+                  </p>
                   <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`px-5 py-3 text-xs tracking-[0.15em] border transition-all duration-300 ${
-                      selectedSize === size
-                        ? "bg-white text-void border-white"
-                        : "border-white/10 text-white/60 hover:border-white/30"
-                    }`}
+                    onClick={() => setShowSizeGuide(true)}
+                    className="text-[10px] tracking-[0.15em] text-white/40 underline underline-offset-4 hover:text-white/60 transition-colors"
                   >
-                    {size}
+                    SIZE GUIDE
                   </button>
-                ))}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {product.sizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={`px-5 py-3 text-xs tracking-[0.15em] border transition-all duration-300 ${
+                        selectedSize === size
+                          ? "bg-white text-void border-white"
+                          : "border-white/10 text-white/60 hover:border-white/30"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Quantity */}
             <div>
@@ -273,17 +282,14 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
             <div className="space-y-3">
               <motion.button
                 onClick={handleAddToCart}
-                disabled={!selectedSize}
                 whileTap={{ scale: 0.98 }}
                 className={`w-full py-5 font-heading text-sm tracking-[0.2em] transition-all duration-300 ${
                   addedToCart
                     ? "bg-green-600 text-white"
-                    : selectedSize
-                    ? "bg-white text-void hover:bg-silver"
-                    : "bg-white/10 text-white/30 cursor-not-allowed"
+                    : "bg-white text-void hover:bg-silver"
                 }`}
               >
-                {addedToCart ? "✓ ADDED TO BAG" : selectedSize ? "ADD TO BAG" : "SELECT A SIZE"}
+                {addedToCart ? "✓ ADDED TO BAG" : "PLACE ORDER"}
               </motion.button>
 
               <motion.a
