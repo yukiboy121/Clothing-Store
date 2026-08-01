@@ -6,11 +6,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cart";
 import { useSearchStore } from "@/store/search";
 import { useAuthStore } from "@/store/auth";
+import { ChevronDown, Heart } from "lucide-react";
 
 export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [aboutDropdownOpen, setAboutDropdownOpen] = useState(false);
 
   const totalItems = useCartStore((s) => s.totalItems);
   const openCart = useCartStore((s) => s.openCart);
@@ -39,8 +41,8 @@ export function Navigation() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled ? "glass-strong py-3" : "py-5"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${
+          scrolled ? "bg-[#060914]/90 backdrop-blur-md border-white/5 py-3" : "bg-transparent border-transparent py-5"
         }`}
       >
         <div className="max-w-[1800px] mx-auto px-6 md:px-10 flex items-center justify-between">
@@ -52,38 +54,80 @@ export function Navigation() {
           >
             <motion.span
               animate={mobileOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-              className="block h-[1.5px] w-full bg-white"
+              className="block h-[1.5px] w-full bg-[#00F0FF]"
             />
             <motion.span
               animate={mobileOpen ? { opacity: 0 } : { opacity: 1 }}
-              className="block h-[1.5px] w-full bg-white"
+              className="block h-[1.5px] w-full bg-[#00F0FF]"
             />
             <motion.span
               animate={mobileOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-              className="block h-[1.5px] w-full bg-white"
+              className="block h-[1.5px] w-full bg-[#00F0FF]"
             />
           </button>
 
           {/* Desktop Nav Links */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link href="/" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
+            <Link href="/" className="text-[11px] font-bold tracking-widest uppercase text-white/70 hover:text-[#00F0FF] transition-colors duration-300">
               Home
             </Link>
-            <Link href="/shop" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
-              Products
+            <Link href="/shop" className="text-[11px] font-bold tracking-widest uppercase text-white/70 hover:text-[#00F0FF] transition-colors duration-300">
+              Shop
             </Link>
-            <Link href="/about" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
-              About
+            <Link href="/services" className="text-[11px] font-bold tracking-widest uppercase text-white/70 hover:text-[#00F0FF] transition-colors duration-300">
+              Services
             </Link>
-            <Link href="/contact" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
+            
+            {/* About Dropdown */}
+            <div 
+              className="relative group py-2"
+              onMouseEnter={() => setAboutDropdownOpen(true)}
+              onMouseLeave={() => setAboutDropdownOpen(false)}
+            >
+              <button className="flex items-center gap-1 text-[11px] font-bold tracking-widest uppercase text-white/70 group-hover:text-[#00F0FF] transition-colors duration-300">
+                About Us
+                <ChevronDown size={14} className={`transition-transform duration-300 ${aboutDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {aboutDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute top-full left-0 mt-0 w-48 bg-[#0A0E1A] border border-white/5 rounded-xl shadow-2xl py-2 z-50 overflow-hidden"
+                  >
+                    {[
+                      { label: "Our Story", href: "/about" },
+                      { label: "Privacy Policy", href: "/privacy-policy" },
+                      { label: "Terms & Conditions", href: "/terms-conditions" },
+                      { label: "Refund Policy", href: "/refund-policy" },
+                    ].map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setAboutDropdownOpen(false)}
+                        className="block px-5 py-2.5 text-xs text-white/60 hover:text-[#00F0FF] hover:bg-white/5 transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <Link href="/order-guide" className="text-[11px] font-bold tracking-widest uppercase text-white/70 hover:text-[#00F0FF] transition-colors duration-300">
+              Order Guide
+            </Link>
+            <Link href="/contact" className="text-[11px] font-bold tracking-widest uppercase text-white/70 hover:text-[#00F0FF] transition-colors duration-300">
               Contact
             </Link>
           </nav>
 
           {/* Logo */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2">
-            <h1 className="font-heading text-2xl md:text-3xl tracking-[0.15em]">
-              UNTERGRUND
+            <h1 className="font-heading text-2xl md:text-3xl tracking-[0.15em] text-[#00F0FF] drop-shadow-[0_0_10px_rgba(0,240,255,0.3)]">
+              DRAGON
             </h1>
           </Link>
 
@@ -91,33 +135,33 @@ export function Navigation() {
           <div className="flex items-center gap-5">
             <button
               onClick={openSearch}
-              className="text-white/70 hover:text-white transition-colors duration-300"
+              className="text-white/70 hover:text-[#00F0FF] transition-colors duration-300"
               aria-label="Search"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.35-4.35" />
               </svg>
             </button>
 
-            <Link href="/wishlist" className="hidden md:block text-white/70 hover:text-white transition-colors duration-300">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
+            <Link href="/wishlist" className="hidden md:block text-white/70 hover:text-[#ee6443] transition-colors duration-300">
+              <Heart size={18} strokeWidth={2} />
             </Link>
 
             {/* User Profile / Auth Button */}
             <div className="relative">
               {user ? (
-                <div className="relative">
+                <div 
+                  className="relative group py-2"
+                  onMouseEnter={() => setUserDropdownOpen(true)}
+                  onMouseLeave={() => setUserDropdownOpen(false)}
+                >
                   <button
-                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="flex items-center gap-2 text-xs tracking-wider uppercase text-white/80 hover:text-white transition-colors duration-300"
+                    className="flex items-center gap-2 text-[11px] font-bold tracking-widest uppercase text-white/70 hover:text-[#00F0FF] transition-colors duration-300"
                   >
-                    <span className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center font-bold text-[11px] text-white">
+                    <span className="w-7 h-7 rounded-full bg-[#00F0FF]/10 border border-[#00F0FF]/30 flex items-center justify-center text-[#00F0FF]">
                       {user.name.charAt(0).toUpperCase()}
                     </span>
-                    <span className="hidden lg:inline">{user.name.split(" ")[0]}</span>
                   </button>
 
                   <AnimatePresence>
@@ -126,28 +170,28 @@ export function Navigation() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 mt-3 w-48 bg-neutral-900 border border-white/10 rounded-xl shadow-2xl py-2 z-50 glass-strong"
+                        className="absolute right-0 top-full mt-0 w-48 bg-[#0A0E1A] border border-white/5 rounded-xl shadow-2xl py-2 z-50 overflow-hidden"
                       >
-                        <div className="px-4 py-2 border-b border-white/10">
-                          <p className="text-xs font-semibold text-white truncate">{user.name}</p>
+                        <div className="px-5 py-3 border-b border-white/5 bg-[#00F0FF]/5">
+                          <p className="text-xs font-semibold text-[#00F0FF] truncate">{user.name}</p>
                           <p className="text-[10px] text-white/50 truncate">{user.email}</p>
                         </div>
 
                         <Link
                           href="/account"
                           onClick={() => setUserDropdownOpen(false)}
-                          className="block px-4 py-2 text-xs text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                          className="block px-5 py-2.5 text-xs text-white/60 hover:text-white hover:bg-white/5 transition-colors"
                         >
-                          My Account & Orders
+                          My Account
                         </Link>
 
                         {user.role === "admin" && (
                           <Link
                             href="/admin"
                             onClick={() => setUserDropdownOpen(false)}
-                            className="block px-4 py-2 text-xs text-amber-400 font-semibold hover:bg-white/5 transition-colors"
+                            className="block px-5 py-2.5 text-xs text-amber-400 font-semibold hover:bg-white/5 transition-colors"
                           >
-                            ⚡ Admin Dashboard
+                            ⚡ Admin Panel
                           </Link>
                         )}
 
@@ -156,7 +200,7 @@ export function Navigation() {
                             setUserDropdownOpen(false);
                             logout();
                           }}
-                          className="w-full text-left px-4 py-2 text-xs text-red-400 hover:bg-white/5 transition-colors"
+                          className="w-full text-left px-5 py-2.5 text-xs text-[#ee6443] hover:bg-white/5 transition-colors"
                         >
                           Sign Out
                         </button>
@@ -167,7 +211,7 @@ export function Navigation() {
               ) : (
                 <Link
                   href="/login"
-                  className="text-xs tracking-wider uppercase text-white/80 hover:text-white border border-white/20 hover:border-white px-3 py-1.5 rounded-lg transition-all duration-300"
+                  className="text-[10px] font-bold tracking-widest uppercase text-white hover:text-[#00F0FF] border border-white/20 hover:border-[#00F0FF] px-4 py-2 rounded-full transition-all duration-300"
                 >
                   Login
                 </Link>
@@ -177,10 +221,10 @@ export function Navigation() {
             {/* Cart Button */}
             <button
               onClick={openCart}
-              className="relative text-white/70 hover:text-white transition-colors duration-300"
+              className="relative text-white/70 hover:text-[#00F0FF] transition-colors duration-300"
               aria-label="Cart"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <path d="M16 10a4 4 0 01-8 0" />
@@ -189,7 +233,7 @@ export function Navigation() {
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-2 -right-2 bg-white text-void text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center"
+                  className="absolute -top-2 -right-2 bg-[#00F0FF] text-black text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.5)]"
                 >
                   {totalItems()}
                 </motion.span>
@@ -207,12 +251,14 @@ export function Navigation() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-void/98 flex flex-col items-center justify-center gap-8"
+            className="fixed inset-0 z-40 bg-[#060914] flex flex-col items-center justify-center gap-6"
           >
             {[
               { href: "/", label: "Home" },
-              { href: "/shop", label: "Products" },
+              { href: "/shop", label: "Shop" },
+              { href: "/services", label: "Services" },
               { href: "/about", label: "About Us" },
+              { href: "/order-guide", label: "Order Guide" },
               { href: "/contact", label: "Contact" },
               ...(user
                 ? [
@@ -231,7 +277,7 @@ export function Navigation() {
                 <Link
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
-                  className="font-heading text-4xl md:text-5xl tracking-wider text-white/80 hover:text-white transition-colors"
+                  className="font-heading text-4xl uppercase tracking-wider text-white/80 hover:text-[#00F0FF] transition-colors"
                 >
                   {item.label}
                 </Link>
