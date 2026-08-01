@@ -5,7 +5,8 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { MarqueeStrip } from "@/components/home/MarqueeStrip";
 import { CollectionsSection } from "@/components/home/CollectionsSection";
 import { LatestDropSection } from "@/components/home/LatestDropSection";
-import { LookbookSection } from "@/components/home/LookbookSection";
+import { LatestGearSection } from "@/components/home/LatestGearSection";
+import { ServicesOverviewSection } from "@/components/home/ServicesOverviewSection";
 import { AboutSection } from "@/components/home/AboutSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 
@@ -36,8 +37,9 @@ export default async function HomePage() {
       <HeroSection />
       <MarqueeStrip />
       <CollectionsSection />
-      <LatestDropSection products={featuredProducts.length > 0 ? featuredProducts : limitedDrops} />
-      <LookbookSection />
+      <LatestDropSection products={limitedDrops} />
+      <LatestGearSection products={featuredProducts} />
+      <ServicesOverviewSection />
       <AboutSection />
       <TestimonialsSection />
     </>
