@@ -66,14 +66,17 @@ export function Navigation() {
 
           {/* Desktop Nav Links */}
           <nav className="hidden md:flex items-center gap-8">
+            <Link href="/" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
+              Home
+            </Link>
             <Link href="/shop" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
-              Shop
+              Products
             </Link>
-            <Link href="/shop?category=Hoodies" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
-              Hoodies
+            <Link href="/about" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
+              About
             </Link>
-            <Link href="/shop?category=Oversized+Tees" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
-              Tees
+            <Link href="/contact" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
+              Contact
             </Link>
           </nav>
 
@@ -207,12 +210,10 @@ export function Navigation() {
             className="fixed inset-0 z-40 bg-void/98 flex flex-col items-center justify-center gap-8"
           >
             {[
-              { href: "/shop", label: "Shop All" },
-              { href: "/shop?category=Hoodies", label: "Hoodies" },
-              { href: "/shop?category=Oversized+Tees", label: "Tees" },
-              { href: "/shop?category=Cargo+Pants", label: "Cargo" },
-              { href: "/shop?category=Jackets", label: "Jackets" },
-              { href: "/shop?category=Accessories", label: "Accessories" },
+              { href: "/", label: "Home" },
+              { href: "/shop", label: "Products" },
+              { href: "/about", label: "About Us" },
+              { href: "/contact", label: "Contact" },
               ...(user
                 ? [
                     { href: "/account", label: "My Account" },
