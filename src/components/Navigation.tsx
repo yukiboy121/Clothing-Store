@@ -41,9 +41,9 @@ export function Navigation() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 py-4 nav-glass${scrolled ? ' nav-glass-scrolled' : ''}`}
+        className="fixed top-0 left-0 right-0 z-50 py-3 px-3 md:px-5 nav-glass"
       >
-        <div className="relative z-10 max-w-[1800px] mx-auto px-6 md:px-10 flex items-center justify-between">
+        <div className={`nav-shell relative z-10 max-w-[1680px] mx-auto px-5 md:px-8 flex items-center justify-between${scrolled ? ' nav-shell-scrolled' : ''}`}>
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -127,7 +127,7 @@ export function Navigation() {
             <img 
               src="https://dragongrouplk.com/wp-content/uploads/2026/05/lVuQD-removebg-preview.png" 
               alt="Dragon Group LK" 
-              className="h-20 md:h-24 object-contain" 
+              className="h-16 md:h-20 object-contain"
             />
           </Link>
 
