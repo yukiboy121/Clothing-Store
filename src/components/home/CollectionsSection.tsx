@@ -30,6 +30,26 @@ const collections = [
     image: "https://images.pexels.com/photos/18956666/pexels-photo-18956666.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=800",
     href: "/shop?category=Accessories",
   },
+  {
+    name: "T-shirts",
+    image: "https://images.pexels.com/photos/1656684/pexels-photo-1656684.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=800",
+    href: "/shop?category=T-shirts",
+  },
+  {
+    name: "Caps",
+    image: "https://images.pexels.com/photos/1124465/pexels-photo-1124465.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=800",
+    href: "/shop?category=Caps",
+  },
+  {
+    name: "Bottoms",
+    image: "https://images.pexels.com/photos/1082528/pexels-photo-1082528.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=800",
+    href: "/shop?category=Bottoms",
+  },
+  {
+    name: "Shorts",
+    image: "https://images.pexels.com/photos/1192601/pexels-photo-1192601.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=800",
+    href: "/shop?category=Shorts",
+  },
 ];
 
 export function CollectionsSection() {

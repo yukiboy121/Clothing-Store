@@ -551,6 +551,10 @@ export default function AdminDashboardPage() {
                       <option>Cargo Pants</option>
                       <option>Jackets</option>
                       <option>Accessories</option>
+                      <option>T-shirts</option>
+                      <option>Caps</option>
+                      <option>Bottoms</option>
+                      <option>Shorts</option>
                     </select>
                   </div>
                 </div>

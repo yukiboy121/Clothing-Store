@@ -66,6 +66,10 @@ export function Footer() {
                 <Link href="/shop?category=Cargo+Pants" className="block text-xs text-white/40 hover:text-white/70 transition-colors">Cargo Pants</Link>
                 <Link href="/shop?category=Jackets" className="block text-xs text-white/40 hover:text-white/70 transition-colors">Jackets</Link>
                 <Link href="/shop?category=Accessories" className="block text-xs text-white/40 hover:text-white/70 transition-colors">Accessories</Link>
+                <Link href="/shop?category=T-shirts" className="block text-xs text-white/40 hover:text-white/70 transition-colors">T-shirts</Link>
+                <Link href="/shop?category=Caps" className="block text-xs text-white/40 hover:text-white/70 transition-colors">Caps</Link>
+                <Link href="/shop?category=Bottoms" className="block text-xs text-white/40 hover:text-white/70 transition-colors">Bottoms</Link>
+                <Link href="/shop?category=Shorts" className="block text-xs text-white/40 hover:text-white/70 transition-colors">Shorts</Link>
               </div>
             </div>
             <div>
