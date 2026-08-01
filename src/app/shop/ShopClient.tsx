@@ -30,7 +30,7 @@ export function ShopClient({ initialProducts, categories }: ShopClientProps) {
 
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [sortBy, setSortBy] = useState("newest");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
   const [showFilters, setShowFilters] = useState(false);
 
   const filteredProducts = useMemo(() => {
@@ -142,16 +142,17 @@ export function ShopClient({ initialProducts, categories }: ShopClientProps) {
             <div className="p-6 border border-white/5 rounded-lg">
               <h3 className="text-xs tracking-[0.2em] text-white/50 mb-4">PRICE RANGE</h3>
               <div className="flex items-center gap-4">
-                <span className="text-xs text-white/30">${priceRange[0]}</span>
+                <span className="text-xs text-white/30">Rs. {priceRange[0]}</span>
                 <input
                   type="range"
                   min={0}
-                  max={500}
+                  max={50000}
+                  step={500}
                   value={priceRange[1]}
                   onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
                   className="flex-1"
                 />
-                <span className="text-xs text-white/30">${priceRange[1]}</span>
+                <span className="text-xs text-white/30">Rs. {priceRange[1]}</span>
               </div>
             </div>
           </motion.div>
@@ -171,7 +172,7 @@ export function ShopClient({ initialProducts, categories }: ShopClientProps) {
           <button
             onClick={() => {
               setSelectedCategory("");
-              setPriceRange([0, 500]);
+              setPriceRange([0, 50000]);
             }}
             className="mt-4 text-xs text-white/50 underline underline-offset-4 hover:text-white transition-colors"
           >
