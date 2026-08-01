@@ -136,9 +136,13 @@ export function CartDrawer() {
                   <span>Shipping</span>
                   <span>{total >= FREE_SHIPPING_THRESHOLD ? "FREE" : "Calculated at checkout"}</span>
                 </div>
-                <button className="w-full py-4 bg-white text-void font-heading text-sm tracking-[0.2em] hover:bg-white/90 transition-colors">
-                  CHECKOUT — ${total.toFixed(2)}
-                </button>
+                <Link
+                  href="/checkout"
+                  onClick={closeCart}
+                  className="block w-full text-center py-4 bg-white text-void font-heading text-sm tracking-[0.2em] hover:bg-white/90 transition-colors"
+                >
+                  CHECKOUT — Rs. {total.toLocaleString()}
+                </Link>
                 <button onClick={closeCart} className="w-full text-center text-xs text-white/40 underline underline-offset-4 hover:text-white/60 transition-colors">
                   Continue Shopping
                 </button>

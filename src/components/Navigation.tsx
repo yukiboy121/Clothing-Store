@@ -5,19 +5,25 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cart";
 import { useSearchStore } from "@/store/search";
+import { useAuthStore } from "@/store/auth";
 
 export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+
   const totalItems = useCartStore((s) => s.totalItems);
   const openCart = useCartStore((s) => s.openCart);
   const openSearch = useSearchStore((s) => s.openSearch);
 
+  const { user, fetchUser, logout } = useAuthStore();
+
   useEffect(() => {
+    fetchUser();
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [fetchUser]);
 
   useEffect(() => {
     if (mobileOpen) {
@@ -90,11 +96,82 @@ export function Navigation() {
                 <path d="m21 21-4.35-4.35" />
               </svg>
             </button>
+
             <Link href="/wishlist" className="hidden md:block text-white/70 hover:text-white transition-colors duration-300">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
             </Link>
+
+            {/* User Profile / Auth Button */}
+            <div className="relative">
+              {user ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                    className="flex items-center gap-2 text-xs tracking-wider uppercase text-white/80 hover:text-white transition-colors duration-300"
+                  >
+                    <span className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center font-bold text-[11px] text-white">
+                      {user.name.charAt(0).toUpperCase()}
+                    </span>
+                    <span className="hidden lg:inline">{user.name.split(" ")[0]}</span>
+                  </button>
+
+                  <AnimatePresence>
+                    {userDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute right-0 mt-3 w-48 bg-neutral-900 border border-white/10 rounded-xl shadow-2xl py-2 z-50 glass-strong"
+                      >
+                        <div className="px-4 py-2 border-b border-white/10">
+                          <p className="text-xs font-semibold text-white truncate">{user.name}</p>
+                          <p className="text-[10px] text-white/50 truncate">{user.email}</p>
+                        </div>
+
+                        <Link
+                          href="/account"
+                          onClick={() => setUserDropdownOpen(false)}
+                          className="block px-4 py-2 text-xs text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          My Account & Orders
+                        </Link>
+
+                        {user.role === "admin" && (
+                          <Link
+                            href="/admin"
+                            onClick={() => setUserDropdownOpen(false)}
+                            className="block px-4 py-2 text-xs text-amber-400 font-semibold hover:bg-white/5 transition-colors"
+                          >
+                            ⚡ Admin Dashboard
+                          </Link>
+                        )}
+
+                        <button
+                          onClick={() => {
+                            setUserDropdownOpen(false);
+                            logout();
+                          }}
+                          className="w-full text-left px-4 py-2 text-xs text-red-400 hover:bg-white/5 transition-colors"
+                        >
+                          Sign Out
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="text-xs tracking-wider uppercase text-white/80 hover:text-white border border-white/20 hover:border-white px-3 py-1.5 rounded-lg transition-all duration-300"
+                >
+                  Login
+                </Link>
+              )}
+            </div>
+
+            {/* Cart Button */}
             <button
               onClick={openCart}
               className="relative text-white/70 hover:text-white transition-colors duration-300"
@@ -136,6 +213,12 @@ export function Navigation() {
               { href: "/shop?category=Cargo+Pants", label: "Cargo" },
               { href: "/shop?category=Jackets", label: "Jackets" },
               { href: "/shop?category=Accessories", label: "Accessories" },
+              ...(user
+                ? [
+                    { href: "/account", label: "My Account" },
+                    ...(user.role === "admin" ? [{ href: "/admin", label: "Admin Portal" }] : []),
+                  ]
+                : [{ href: "/login", label: "Login / Register" }]),
             ].map((item, i) => (
               <motion.div
                 key={item.href}

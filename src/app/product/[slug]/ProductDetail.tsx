@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cart";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductReviews } from "@/components/ProductReviews";
 
 interface Product {
   id: number;
@@ -309,6 +310,9 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
             </div>
           </div>
         </div>
+
+        {/* Product Reviews */}
+        <ProductReviews productId={product.id} />
 
         {/* Recommended Products */}
         {recommended.length > 0 && (
