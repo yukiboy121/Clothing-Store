@@ -77,12 +77,103 @@ body {
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 }
 
+/* =============================================
+   LIQUID GLASS NAVBAR
+   ============================================= */
 .nav-glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(30px) saturate(200%);
-  -webkit-backdrop-filter: blur(30px) saturate(200%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  /* Frosted glass base */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.01) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  backdrop-filter: blur(40px) saturate(300%) brightness(1.05);
+  -webkit-backdrop-filter: blur(40px) saturate(300%) brightness(1.05);
+
+  /* Prismatic shimmer border */
+  border-bottom: 1px solid;
+  border-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.25) 20%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.25) 80%,
+    transparent 100%
+  ) 1;
+
+  /* Layered shadow for depth */
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.08) inset,
+    0 -1px 0 0 rgba(0, 0, 0, 0.2) inset,
+    0 4px 24px rgba(0, 0, 0, 0.25),
+    0 1px 4px rgba(0, 0, 0, 0.15);
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated shimmer sweep over the navbar */
+.nav-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 0%,
+    transparent 30%,
+    rgba(255, 255, 255, 0.04) 45%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 55%,
+    transparent 70%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: nav-shimmer 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Top inner light edge */
+.nav-glass::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.15) 20%,
+    rgba(255,255,255,0.35) 50%,
+    rgba(255,255,255,0.15) 80%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Stronger glass when user scrolls */
+.nav-glass-scrolled {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 15, 20, 0.75) 0%,
+    rgba(10, 10, 15, 0.65) 50%,
+    rgba(15, 15, 20, 0.75) 100%
+  );
+  backdrop-filter: blur(50px) saturate(280%) brightness(0.98);
+  -webkit-backdrop-filter: blur(50px) saturate(280%) brightness(0.98);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.07) inset,
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes nav-shimmer {
+  0%   { background-position: 200% 0; }
+  50%  { background-position: -50% 0; }
+  100% { background-position: 200% 0; }
 }
 
 @keyframes marquee {
