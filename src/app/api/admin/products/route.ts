@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { products } from "@/db/schema";
 import { verifyAdminSession } from "@/lib/auth";
@@ -31,6 +32,9 @@ export async function POST(req: Request) {
         featured: data.featured || false,
       })
       .returning();
+
+    revalidatePath("/shop");
+    revalidatePath("/");
 
     return NextResponse.json({ success: true, product: newProduct });
   } catch (error: any) {
