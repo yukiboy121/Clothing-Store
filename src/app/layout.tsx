@@ -7,8 +7,8 @@ import { SearchModal } from "@/components/SearchModal";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "UNTERGRUND — Premium Streetwear",
-  description: "Built for the underground. Limited drops. Premium quality. No restocks. Australian luxury streetwear.",
+  title: "Dragon Group LK",
+  description: "Premium Custom Apparel, Printing, and Clothing Manufacturer in Sri Lanka.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -15,7 +15,7 @@ export function Footer() {
           transition={{ duration: 0.8 }}
         >
           <h2 className="font-heading text-4xl md:text-6xl lg:text-7xl tracking-wider mb-4">
-            JOIN THE UNDERGROUND
+            DRAGON GROUP LK
           </h2>
           <p className="text-white/40 text-sm md:text-base max-w-md mx-auto mb-10">
             Be the first to know about new drops, exclusive releases, and underground events.
@@ -114,9 +114,9 @@ export function Footer() {
           </div>
 
           <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-            <span className="font-heading text-lg tracking-[0.15em]">UNTERGRUND</span>
+            <span className="font-heading text-lg tracking-[0.15em]">DRAGON GROUP LK</span>
             <p className="text-[10px] text-white/20">
-              © 2026 UNTERGRUND. All rights reserved. Built for the underground.
+              © 2026 Dragon Group LK. All rights reserved. Built for the underground.
             </p>
           </div>
         </div>
