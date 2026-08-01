@@ -81,15 +81,21 @@ body {
    LIQUID GLASS NAVBAR
    ============================================= */
 .nav-glass {
-  /* Full-width iOS-inspired liquid glass sheet. Keep position controlled by Tailwind. */
+  /* Premium floating glass material — layout remains entirely component-controlled. */
   overflow: visible;
   isolation: isolate;
-  background: linear-gradient(100deg, rgba(4, 8, 17, 0.31), rgba(17, 20, 31, 0.16) 46%, rgba(7, 10, 20, 0.29));
-  backdrop-filter: blur(30px) saturate(165%) brightness(1.10);
-  -webkit-backdrop-filter: blur(30px) saturate(165%) brightness(1.10);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.20);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.14) inset, 0 14px 38px rgba(0, 0, 0, 0.22);
-  transition: background 400ms ease, box-shadow 400ms ease;
+  background: rgba(8, 12, 20, 0.45);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0 0 18px 18px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.13) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.14) inset,
+    0 8px 18px rgba(0, 0, 0, 0.16),
+    0 18px 42px rgba(0, 0, 0, 0.18),
+    0 0 24px rgba(34, 211, 238, 0.10);
+  transition: background 500ms ease, backdrop-filter 500ms ease, box-shadow 500ms ease, border-color 500ms ease;
 }
 
 .nav-glass::before {
@@ -97,38 +103,56 @@ body {
   position: absolute;
   z-index: 0;
   inset: 0;
+  border-radius: inherit;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 18% 175% at 14% 50%, rgba(255, 255, 255, 0.17), transparent 70%),
-    radial-gradient(ellipse 22% 170% at 40% 48%, rgba(167, 243, 208, 0.11), transparent 68%),
-    radial-gradient(ellipse 18% 170% at 64% 45%, rgba(255, 255, 255, 0.13), transparent 68%),
-    radial-gradient(ellipse 20% 175% at 89% 48%, rgba(196, 181, 253, 0.10), transparent 70%);
-  filter: blur(10px);
-  opacity: 0.72;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.025) 34%, transparent 58%),
+    linear-gradient(110deg, transparent 28%, rgba(193, 245, 255, 0.05) 43%, rgba(255, 255, 255, 0.18) 50%, rgba(193, 245, 255, 0.05) 57%, transparent 72%);
+  background-size: 100% 100%, 240% 100%;
+  background-position: 0 0, 180% 0;
+  animation: nav-glass-shine 12s ease-in-out infinite;
 }
 
 .nav-glass::after {
   content: '';
   position: absolute;
-  z-index: 0;
+  z-index: -1;
   left: 0;
   right: 0;
-  bottom: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.32) 18%, rgba(255, 255, 255, 0.68) 50%, rgba(255, 255, 255, 0.25) 82%, transparent);
+  bottom: -16px;
+  height: 16px;
+  border-radius: 0 0 18px 18px;
+  background: linear-gradient(to bottom, rgba(2, 6, 13, 0.22), rgba(2, 6, 13, 0));
+  filter: blur(7px);
   pointer-events: none;
+}
+
+.nav-glass:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.16) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.14) inset,
+    0 8px 18px rgba(0, 0, 0, 0.16),
+    0 18px 42px rgba(0, 0, 0, 0.20),
+    0 0 30px rgba(34, 211, 238, 0.14);
 }
 
 .nav-glass-scrolled {
   background: linear-gradient(
     100deg,
-    rgba(3, 7, 15, 0.42) 0%,
-    rgba(14, 17, 27, 0.26) 48%,
-    rgba(4, 7, 16, 0.40) 100%
+    rgba(8, 12, 20, 0.58) 0%,
+    rgba(8, 12, 20, 0.54) 48%,
+    rgba(8, 12, 20, 0.58) 100%
   );
-  backdrop-filter: blur(34px) saturate(170%) brightness(1.08);
-  -webkit-backdrop-filter: blur(34px) saturate(170%) brightness(1.08);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.16) inset, 0 16px 42px rgba(0, 0, 0, 0.30);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-color: rgba(255, 255, 255, 0.11);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.16) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.18) inset,
+    0 10px 22px rgba(0, 0, 0, 0.22),
+    0 20px 48px rgba(0, 0, 0, 0.24),
+    0 0 28px rgba(34, 211, 238, 0.13);
 }
 
 /* Dropdown panels use the same material but are their own stacking context. */
@@ -140,10 +164,10 @@ body {
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.48), 0 1px 0 rgba(255, 255, 255, 0.20) inset;
 }
 
-@keyframes nav-shimmer {
-  0%   { background-position: 200% 0; }
-  50%  { background-position: -50% 0; }
-  100% { background-position: 200% 0; }
+@keyframes nav-glass-shine {
+  0%, 22% { background-position: 0 0, 180% 0; }
+  58% { background-position: 0 0, -80% 0; }
+  100% { background-position: 0 0, -80% 0; }
 }
 
 @keyframes marquee {
