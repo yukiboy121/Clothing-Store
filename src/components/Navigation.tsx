@@ -127,7 +127,7 @@ export function Navigation() {
             <img 
               src="https://dragongrouplk.com/wp-content/uploads/2026/05/lVuQD-removebg-preview.png" 
               alt="Dragon Group LK" 
-              className="h-10 md:h-12 object-contain" 
+              className="h-20 md:h-24 object-contain" 
             />
           </Link>
 
