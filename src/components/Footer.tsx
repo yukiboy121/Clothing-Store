@@ -116,7 +116,7 @@ export function Footer() {
           <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
             <span className="font-heading text-lg tracking-[0.15em]">DRAGON GROUP LK</span>
             <p className="text-[10px] text-white/20">
-              © 2026 Dragon Group LK. All rights reserved. Built for the underground.
+              © 2026 Dragon Group LK. All rights reserved. Built by Mr.YuKi.
             </p>
           </div>
         </div>
