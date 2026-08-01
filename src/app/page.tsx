@@ -37,8 +37,8 @@ export default async function HomePage() {
       <HeroSection />
       <MarqueeStrip />
       <CollectionsSection />
-      <LatestGearSection products={featuredProducts} />
-      <LatestDropSection products={limitedDrops} />
+      <LatestDropSection products={limitedDrops.length > 0 ? limitedDrops : featuredProducts.slice(0, 4)} />
+      <LatestGearSection products={featuredProducts.length > 4 ? featuredProducts.slice(4) : featuredProducts} />
       <ServicesOverviewSection />
       <AboutSection />
       <TestimonialsSection />

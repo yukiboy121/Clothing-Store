@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cart";
 import { useSearchStore } from "@/store/search";
@@ -14,8 +13,6 @@ export function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [aboutDropdownOpen, setAboutDropdownOpen] = useState(false);
-
-  const pathname = usePathname();
 
   const totalItems = useCartStore((s) => s.totalItems);
   const openCart = useCartStore((s) => s.openCart);
@@ -68,28 +65,16 @@ export function Navigation() {
           </button>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-4 lg:gap-6">
-            <Link 
-              href="/" 
-              className={`text-sm font-medium transition-colors duration-300 pb-1 ${pathname === "/" ? "text-[#00E5FF] border-b border-[#00E5FF]" : "text-white/80 hover:text-white"}`}
-            >
-              Home Page
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+            <Link href="/" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
+              Home
             </Link>
-            <span className="text-white/20">|</span>
-            <Link 
-              href="/shop" 
-              className={`text-sm font-medium transition-colors duration-300 pb-1 ${pathname === "/shop" ? "text-[#00E5FF] border-b border-[#00E5FF]" : "text-white/80 hover:text-white"}`}
-            >
-              Shop
+            <Link href="/shop" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
+              Products
             </Link>
-            <span className="text-white/20">|</span>
-            <Link 
-              href="/services" 
-              className={`text-sm font-medium transition-colors duration-300 pb-1 ${pathname === "/services" ? "text-[#00E5FF] border-b border-[#00E5FF]" : "text-white/80 hover:text-white"}`}
-            >
+            <Link href="/services" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
               Services
             </Link>
-            <span className="text-white/20">|</span>
             
             {/* About Dropdown */}
             <div 
@@ -97,9 +82,7 @@ export function Navigation() {
               onMouseEnter={() => setAboutDropdownOpen(true)}
               onMouseLeave={() => setAboutDropdownOpen(false)}
             >
-              <button 
-                className={`flex items-center gap-1 text-sm font-medium transition-colors duration-300 pb-1 ${pathname.startsWith("/about") ? "text-[#00E5FF] border-b border-[#00E5FF]" : "text-white/80 group-hover:text-white"}`}
-              >
+              <button className="flex items-center gap-1 text-xs tracking-[0.2em] uppercase text-white/70 group-hover:text-white transition-colors duration-300">
                 About Us
                 <ChevronDown size={14} className={`transition-transform duration-300 ${aboutDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -109,7 +92,7 @@ export function Navigation() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-48 bg-[#0a101f]/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl py-2 z-50 overflow-hidden"
+                    className="absolute top-full left-0 mt-0 w-48 bg-neutral-900 border border-white/10 rounded-xl shadow-2xl py-2 z-50 overflow-hidden glass-strong"
                   >
                     {[
                       { label: "Our Story", href: "/about" },
@@ -121,7 +104,7 @@ export function Navigation() {
                         key={link.href}
                         href={link.href}
                         onClick={() => setAboutDropdownOpen(false)}
-                        className="block px-4 py-2 text-sm text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                        className="block px-4 py-2 text-xs text-white/60 hover:text-white hover:bg-white/10 transition-colors"
                       >
                         {link.label}
                       </Link>
@@ -130,20 +113,12 @@ export function Navigation() {
                 )}
               </AnimatePresence>
             </div>
-            <span className="text-white/20">|</span>
 
-            <Link 
-              href="/order-guide" 
-              className={`text-sm font-medium transition-colors duration-300 pb-1 ${pathname === "/order-guide" ? "text-[#00E5FF] border-b border-[#00E5FF]" : "text-white/80 hover:text-white"}`}
-            >
+            <Link href="/order-guide" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
               Order Guide
             </Link>
-            <span className="text-white/20">|</span>
-            <Link 
-              href="/contact" 
-              className={`text-sm font-medium transition-colors duration-300 pb-1 ${pathname === "/contact" ? "text-[#00E5FF] border-b border-[#00E5FF]" : "text-white/80 hover:text-white"}`}
-            >
-              Contact Us
+            <Link href="/contact" className="text-xs tracking-[0.2em] uppercase text-white/70 hover:text-white transition-colors duration-300">
+              Contact
             </Link>
           </nav>
 
