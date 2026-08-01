@@ -81,36 +81,37 @@ body {
    LIQUID GLASS NAVBAR
    ============================================= */
 .nav-glass {
-  /* Frosted glass base */
+  /* Keep the header fixed.  Do not set position or overflow here: this class
+     is applied to the header itself and dropdowns must be allowed to escape it. */
+  isolation: isolate;
+  overflow: visible;
+
+  /* Dark, refractive glass base */
   background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0.01) 50%,
-    rgba(255, 255, 255, 0.04) 100%
+    112deg,
+    rgba(20, 24, 39, 0.82) 0%,
+    rgba(8, 12, 25, 0.66) 42%,
+    rgba(28, 22, 45, 0.72) 100%
   );
-  backdrop-filter: blur(40px) saturate(300%) brightness(1.05);
-  -webkit-backdrop-filter: blur(40px) saturate(300%) brightness(1.05);
+  backdrop-filter: blur(28px) saturate(165%) brightness(1.12);
+  -webkit-backdrop-filter: blur(28px) saturate(165%) brightness(1.12);
 
   /* Prismatic shimmer border */
   border-bottom: 1px solid;
   border-image: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.25) 20%,
-    rgba(255, 255, 255, 0.5) 50%,
-    rgba(255, 255, 255, 0.25) 80%,
+    rgba(147, 197, 253, 0.22) 20%,
+    rgba(255, 255, 255, 0.62) 50%,
+    rgba(196, 181, 253, 0.24) 80%,
     transparent 100%
   ) 1;
 
   /* Layered shadow for depth */
   box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.08) inset,
-    0 -1px 0 0 rgba(0, 0, 0, 0.2) inset,
-    0 4px 24px rgba(0, 0, 0, 0.25),
-    0 1px 4px rgba(0, 0, 0, 0.15);
-
-  position: relative;
-  overflow: hidden;
+    0 1px 0 rgba(255, 255, 255, 0.22) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.18) inset,
+    0 10px 36px rgba(0, 0, 0, 0.22);
 }
 
 /* Animated shimmer sweep over the navbar */
@@ -118,18 +119,12 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    110deg,
-    transparent 0%,
-    transparent 30%,
-    rgba(255, 255, 255, 0.04) 45%,
-    rgba(255, 255, 255, 0.08) 50%,
-    rgba(255, 255, 255, 0.04) 55%,
-    transparent 70%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: nav-shimmer 6s ease-in-out infinite;
+  background:
+    radial-gradient(ellipse 42% 180% at 15% -45%, rgba(125, 211, 252, 0.24), transparent 65%),
+    radial-gradient(ellipse 34% 155% at 85% -40%, rgba(196, 181, 253, 0.18), transparent 70%),
+    linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.10) 50%, transparent 75%);
+  background-size: auto, auto, 220% 100%;
+  animation: nav-shimmer 8s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
 }
@@ -157,17 +152,25 @@ body {
 /* Stronger glass when user scrolls */
 .nav-glass-scrolled {
   background: linear-gradient(
-    135deg,
-    rgba(15, 15, 20, 0.75) 0%,
-    rgba(10, 10, 15, 0.65) 50%,
-    rgba(15, 15, 20, 0.75) 100%
+    112deg,
+    rgba(16, 20, 34, 0.91) 0%,
+    rgba(5, 9, 19, 0.84) 48%,
+    rgba(25, 18, 39, 0.86) 100%
   );
-  backdrop-filter: blur(50px) saturate(280%) brightness(0.98);
-  -webkit-backdrop-filter: blur(50px) saturate(280%) brightness(0.98);
+  backdrop-filter: blur(34px) saturate(175%) brightness(1.06);
+  -webkit-backdrop-filter: blur(34px) saturate(175%) brightness(1.06);
   box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.07) inset,
-    0 8px 32px rgba(0, 0, 0, 0.45),
-    0 2px 8px rgba(0, 0, 0, 0.3);
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 12px 40px rgba(0, 0, 0, 0.34);
+}
+
+/* Dropdown panels use the same material but are their own stacking context. */
+.nav-dropdown {
+  background: linear-gradient(135deg, rgba(30, 35, 54, 0.93), rgba(9, 13, 27, 0.9));
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.15) inset;
 }
 
 @keyframes nav-shimmer {

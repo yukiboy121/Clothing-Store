@@ -92,7 +92,7 @@ export function Navigation() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-full left-0 mt-0 w-48 bg-neutral-900 border border-white/10 rounded-xl shadow-2xl py-2 z-50 overflow-hidden glass-strong"
+                    className="nav-dropdown absolute top-full left-0 mt-1 w-52 rounded-2xl py-2 z-[60] overflow-hidden"
                   >
                     {[
                       { label: "Our Story", href: "/about" },
@@ -171,7 +171,7 @@ export function Navigation() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 top-full mt-0 w-48 bg-neutral-900 border border-white/10 rounded-xl shadow-2xl py-2 z-50 overflow-hidden glass-strong"
+                        className="nav-dropdown absolute right-0 top-full mt-1 w-52 rounded-2xl py-2 z-[60] overflow-hidden"
                       >
                         <div className="px-4 py-2 border-b border-white/10">
                           <p className="text-xs font-semibold text-white truncate">{user.name}</p>
