@@ -170,13 +170,13 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
               <p className="text-[10px] tracking-[0.3em] text-white/30 mb-3">{product.category.toUpperCase()}</p>
               <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl tracking-wider">{product.name}</h1>
               <div className="flex items-center gap-3 mt-4">
-                <span className="text-xl md:text-2xl">${product.price.toFixed(2)}</span>
+                <span className="text-xl md:text-2xl">Rs. {product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 {product.comparePrice && (
-                  <span className="text-base text-white/30 line-through">${product.comparePrice.toFixed(2)}</span>
+                  <span className="text-base text-white/30 line-through">Rs. {product.comparePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 )}
                 {product.comparePrice && (
                   <span className="text-[10px] bg-red-600/20 text-red-400 px-2 py-1 tracking-wider">
-                    SAVE ${(product.comparePrice - product.price).toFixed(0)}
+                    SAVE Rs. {(product.comparePrice - product.price).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                   </span>
                 )}
               </div>
@@ -295,7 +295,7 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
             {/* Features */}
             <div className="space-y-3 pt-4">
               {[
-                "Free shipping on orders over $250",
+                "Free shipping on orders over Rs. 250",
                 "14-day returns policy",
                 "Premium packaging",
                 "Worldwide delivery",

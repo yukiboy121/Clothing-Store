@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProductCard } from "@/components/ProductCard";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface Product {
   id: number;
@@ -26,23 +27,70 @@ interface ShopClientProps {
 
 export function ShopClient({ initialProducts, categories }: ShopClientProps) {
   const searchParams = useSearchParams();
-  const initialCategory = searchParams.get("category") || "";
+  const initialCategory = searchParams.get("category");
 
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  // Filter States
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategory ? [initialCategory] : []);
+  const [minPrice, setMinPrice] = useState<string>("0");
+  const [maxPrice, setMaxPrice] = useState<string>("50000");
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("newest");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
-  const [showFilters, setShowFilters] = useState(false);
+  
+  // Mobile filter toggle
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // Sections collapse state
+  const [sections, setSections] = useState({
+    categories: true,
+    price: true,
+    colors: true,
+    sizes: true,
+  });
+
+  const toggleSection = (section: keyof typeof sections) => {
+    setSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  // Derive all available colors and sizes from products
+  const availableColors = useMemo(() => {
+    const colorMap = new Map<string, string>();
+    initialProducts.forEach(p => {
+      p.colors.forEach(c => colorMap.set(c.name, c.hex));
+    });
+    return Array.from(colorMap.entries()).map(([name, hex]) => ({ name, hex }));
+  }, [initialProducts]);
+
+  const availableSizes = useMemo(() => {
+    const sizeSet = new Set<string>();
+    initialProducts.forEach(p => {
+      p.sizes.forEach(s => sizeSet.add(s));
+    });
+    return Array.from(sizeSet).sort();
+  }, [initialProducts]);
 
   const filteredProducts = useMemo(() => {
     let filtered = [...initialProducts];
 
-    if (selectedCategory) {
-      filtered = filtered.filter((p) => p.category === selectedCategory);
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter((p) => selectedCategories.includes(p.category));
     }
 
-    filtered = filtered.filter(
-      (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
-    );
+    const min = parseFloat(minPrice) || 0;
+    const max = parseFloat(maxPrice) || Infinity;
+    filtered = filtered.filter((p) => p.price >= min && p.price <= max);
+
+    if (selectedColors.length > 0) {
+      filtered = filtered.filter((p) => 
+        p.colors.some(c => selectedColors.includes(c.name))
+      );
+    }
+
+    if (selectedSizes.length > 0) {
+      filtered = filtered.filter((p) => 
+        p.sizes.some(s => selectedSizes.includes(s))
+      );
+    }
 
     switch (sortBy) {
       case "price-asc":
@@ -59,68 +107,165 @@ export function ShopClient({ initialProducts, categories }: ShopClientProps) {
     }
 
     return filtered;
-  }, [initialProducts, selectedCategory, sortBy, priceRange]);
+  }, [initialProducts, selectedCategories, minPrice, maxPrice, selectedColors, selectedSizes, sortBy]);
+
+  const toggleCategory = (cat: string) => {
+    setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
+  };
+  
+  const toggleColor = (colorName: string) => {
+    setSelectedColors(prev => prev.includes(colorName) ? prev.filter(c => c !== colorName) : [...prev, colorName]);
+  };
+
+  const toggleSize = (size: string) => {
+    setSelectedSizes(prev => prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]);
+  };
+
+  const clearAll = () => {
+    setSelectedCategories([]);
+    setMinPrice("0");
+    setMaxPrice("50000");
+    setSelectedColors([]);
+    setSelectedSizes([]);
+  };
+
+  // Helper to get count
+  const getCategoryCount = (cat: string) => initialProducts.filter(p => p.category === cat).length;
+
+  const SidebarContent = () => (
+    <div className="space-y-8">
+      {/* Categories */}
+      <div>
+        <button onClick={() => toggleSection('categories')} className="flex items-center justify-between w-full text-left mb-4">
+          <h3 className="font-heading text-lg tracking-wider">Categories</h3>
+          {sections.categories ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+        {sections.categories && (
+          <div className="space-y-3">
+            {categories.map(cat => (
+              <label key={cat} className="flex items-center justify-between cursor-pointer group text-sm">
+                <div className="flex items-center gap-3">
+                  <div className={`w-4 h-4 border flex items-center justify-center transition-colors ${selectedCategories.includes(cat) ? 'bg-white border-white' : 'border-white/20 group-hover:border-white/50'}`}>
+                    {selectedCategories.includes(cat) && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                  </div>
+                  <span className={selectedCategories.includes(cat) ? 'text-white' : 'text-white/60 group-hover:text-white transition-colors'}>{cat}</span>
+                </div>
+                <span className="text-white/30 text-xs">{getCategoryCount(cat)}</span>
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Price Range */}
+      <div className="border-t border-white/5 pt-8">
+        <button onClick={() => toggleSection('price')} className="flex items-center justify-between w-full text-left mb-4">
+          <h3 className="font-heading text-lg tracking-wider">Price Range</h3>
+          {sections.price ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+        {sections.price && (
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <label className="text-[10px] text-white/50 uppercase tracking-widest block mb-1">Min Price</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-xs">Rs.</span>
+                <input type="number" value={minPrice} onChange={e => setMinPrice(e.target.value)} className="w-full bg-black/40 border border-white/10 rounded px-3 py-2 pl-8 text-sm focus:outline-none focus:border-white/30 transition-colors" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <label className="text-[10px] text-white/50 uppercase tracking-widest block mb-1">Max Price</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-xs">Rs.</span>
+                <input type="number" value={maxPrice} onChange={e => setMaxPrice(e.target.value)} className="w-full bg-black/40 border border-white/10 rounded px-3 py-2 pl-8 text-sm focus:outline-none focus:border-white/30 transition-colors" />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Colors */}
+      {availableColors.length > 0 && (
+        <div className="border-t border-white/5 pt-8">
+          <button onClick={() => toggleSection('colors')} className="flex items-center justify-between w-full text-left mb-4">
+            <h3 className="font-heading text-lg tracking-wider">Colors</h3>
+            {sections.colors ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          {sections.colors && (
+            <div className="flex flex-wrap gap-3">
+              {availableColors.map(color => (
+                <button
+                  key={color.name}
+                  onClick={() => toggleColor(color.name)}
+                  title={color.name}
+                  className={`w-8 h-8 rounded-full border-2 transition-all ${selectedColors.includes(color.name) ? 'border-white scale-110' : 'border-transparent hover:scale-110'}`}
+                  style={{ backgroundColor: color.hex }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Sizes */}
+      {availableSizes.length > 0 && (
+        <div className="border-t border-white/5 pt-8">
+          <button onClick={() => toggleSection('sizes')} className="flex items-center justify-between w-full text-left mb-4">
+            <h3 className="font-heading text-lg tracking-wider">Sizes</h3>
+            {sections.sizes ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          {sections.sizes && (
+            <div className="grid grid-cols-4 gap-2">
+              {availableSizes.map(size => (
+                <button
+                  key={size}
+                  onClick={() => toggleSize(size)}
+                  className={`py-2 text-xs font-bold transition-colors border ${selectedSizes.includes(size) ? 'bg-white text-black border-white' : 'bg-transparent text-white/60 border-white/10 hover:border-white/30 hover:text-white'}`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="border-t border-white/5 pt-8 flex gap-3">
+        <button onClick={clearAll} className="flex-1 py-3 border border-white/20 text-xs font-bold tracking-widest uppercase hover:bg-white/5 transition-colors rounded-lg">
+          Clear All
+        </button>
+        <button onClick={() => setShowMobileFilters(false)} className="flex-1 py-3 bg-white text-black text-xs font-bold tracking-widest uppercase hover:bg-neutral-200 transition-colors lg:hidden rounded-lg">
+          Apply
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="pt-24 md:pt-32 pb-20 px-6 md:px-10 max-w-[1800px] mx-auto">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="mb-10 md:mb-16"
-      >
-        <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl tracking-wider">
-          {selectedCategory || "SHOP ALL"}
-        </h1>
-        <p className="text-white/40 text-sm mt-3 tracking-wider">
-          {filteredProducts.length} product{filteredProducts.length !== 1 ? "s" : ""}
-        </p>
-      </motion.div>
-
-      {/* Filters Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-6 border-b border-white/5">
-        <div className="flex items-center gap-3 overflow-x-auto hide-scrollbar">
-          <button
-            onClick={() => setSelectedCategory("")}
-            className={`whitespace-nowrap px-4 py-2 text-[10px] tracking-[0.2em] border transition-colors ${
-              !selectedCategory
-                ? "bg-white text-void border-white"
-                : "border-white/10 text-white/50 hover:border-white/30"
-            }`}
-          >
-            ALL
-          </button>
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(selectedCategory === cat ? "" : cat)}
-              className={`whitespace-nowrap px-4 py-2 text-[10px] tracking-[0.2em] border transition-colors ${
-                selectedCategory === cat
-                  ? "bg-white text-void border-white"
-                  : "border-white/10 text-white/50 hover:border-white/30"
-              }`}
-            >
-              {cat.toUpperCase()}
-            </button>
-          ))}
-        </div>
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b border-white/5 gap-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl tracking-wider">
+            SHOP ALL
+          </h1>
+          <p className="text-white/40 text-sm mt-2 tracking-wider">
+            Showing {filteredProducts.length} product{filteredProducts.length !== 1 ? "s" : ""}
+          </p>
+        </motion.div>
 
         <div className="flex items-center gap-4">
           <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 text-[10px] tracking-[0.2em] text-white/50 hover:text-white transition-colors md:hidden"
+            onClick={() => setShowMobileFilters(true)}
+            className="flex items-center justify-center flex-1 md:flex-none gap-2 border border-white/10 px-6 py-3 text-xs tracking-[0.2em] hover:bg-white/5 transition-colors lg:hidden"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
-            </svg>
             FILTERS
           </button>
-
+          
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="bg-transparent border border-white/10 px-4 py-2 text-[10px] tracking-[0.15em] text-white/50 focus:outline-none focus:border-white/30 appearance-none cursor-pointer"
+            className="bg-transparent border border-white/10 px-4 py-3 text-xs tracking-[0.15em] text-white/50 focus:outline-none focus:border-white/30 appearance-none cursor-pointer flex-1 md:flex-none"
           >
             <option value="newest" className="bg-abyss">NEWEST</option>
             <option value="price-asc" className="bg-abyss">PRICE: LOW → HIGH</option>
@@ -130,56 +275,63 @@ export function ShopClient({ initialProducts, categories }: ShopClientProps) {
         </div>
       </div>
 
-      {/* Extended Filters */}
-      <AnimatePresence>
-        {showFilters && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-8"
-          >
-            <div className="p-6 border border-white/5 rounded-lg">
-              <h3 className="text-xs tracking-[0.2em] text-white/50 mb-4">PRICE RANGE</h3>
-              <div className="flex items-center gap-4">
-                <span className="text-xs text-white/30">Rs. {priceRange[0]}</span>
-                <input
-                  type="range"
-                  min={0}
-                  max={50000}
-                  step={500}
-                  value={priceRange[1]}
-                  onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                  className="flex-1"
-                />
-                <span className="text-xs text-white/30">Rs. {priceRange[1]}</span>
-              </div>
+      <div className="flex flex-col lg:flex-row gap-10">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:block w-64 flex-shrink-0">
+          <SidebarContent />
+        </aside>
+
+        {/* Mobile Sidebar Overlay */}
+        <AnimatePresence>
+          {showMobileFilters && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowMobileFilters(false)}
+                className="fixed inset-0 bg-black/80 z-40 lg:hidden backdrop-blur-sm"
+              />
+              <motion.div
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "tween", duration: 0.3 }}
+                className="fixed inset-y-0 left-0 w-[85vw] sm:w-[350px] bg-[#050505] z-50 p-6 overflow-y-auto border-r border-white/10 lg:hidden"
+              >
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="font-heading text-2xl tracking-wider">FILTERS</h2>
+                  <button onClick={() => setShowMobileFilters(false)} className="text-white/50 hover:text-white p-2">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                  </button>
+                </div>
+                <SidebarContent />
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Product Grid */}
+        <div className="flex-1">
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            {filteredProducts.map((product, i) => (
+              <ProductCard key={product.id} product={product} index={i} />
+            ))}
+          </div>
+
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-20 border border-white/5 mt-4 rounded-xl">
+              <p className="text-white/40 mb-4">No products match your filters</p>
+              <button
+                onClick={clearAll}
+                className="text-xs text-white underline underline-offset-4 hover:text-white/70 transition-colors"
+              >
+                Clear all filters
+              </button>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Product Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-        {filteredProducts.map((product, i) => (
-          <ProductCard key={product.id} product={product} index={i} />
-        ))}
-      </div>
-
-      {filteredProducts.length === 0 && (
-        <div className="text-center py-20">
-          <p className="text-white/30 text-sm">No products found</p>
-          <button
-            onClick={() => {
-              setSelectedCategory("");
-              setPriceRange([0, 50000]);
-            }}
-            className="mt-4 text-xs text-white/50 underline underline-offset-4 hover:text-white transition-colors"
-          >
-            Clear all filters
-          </button>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

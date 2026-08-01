@@ -103,7 +103,7 @@ export function SearchModal() {
                     <div>
                       <h3 className="text-sm font-medium tracking-wider">{product.name}</h3>
                       <p className="text-xs text-white/40 mt-1">{product.category}</p>
-                      <p className="text-sm mt-1">${product.price.toFixed(2)}</p>
+                      <p className="text-sm mt-1">Rs. {product.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>
                   </Link>
                 </motion.div>

@@ -44,8 +44,8 @@ export function CartDrawer() {
             {/* Free Shipping Progress */}
             <div className="px-6 py-4 border-b border-white/5">
               <div className="flex justify-between text-xs text-white/50 mb-2">
-                <span>{remaining > 0 ? `$${remaining.toFixed(0)} away from free shipping` : "Free shipping unlocked! 🎉"}</span>
-                <span>${FREE_SHIPPING_THRESHOLD}</span>
+                <span>{remaining > 0 ? `Rs. ${remaining.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} away from free shipping` : "Free shipping unlocked! 🎉"}</span>
+                <span>Rs. {FREE_SHIPPING_THRESHOLD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="h-[2px] bg-white/10 rounded-full overflow-hidden">
                 <motion.div
@@ -107,7 +107,7 @@ export function CartDrawer() {
                             </button>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className="text-xs">${(item.price * item.quantity).toFixed(2)}</span>
+                            <span className="text-xs">Rs. {(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             <button
                               onClick={() => removeItem(item.productId, item.size, item.color)}
                               className="text-white/30 hover:text-white transition-colors"
@@ -130,7 +130,7 @@ export function CartDrawer() {
               <div className="border-t border-white/5 p-6 space-y-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-white/50">Subtotal</span>
-                  <span className="font-medium">${total.toFixed(2)}</span>
+                  <span className="font-medium">Rs. {total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
                 <div className="flex justify-between text-[11px] text-white/30">
                   <span>Shipping</span>

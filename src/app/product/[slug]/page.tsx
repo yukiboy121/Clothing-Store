@@ -16,11 +16,13 @@ export default async function ProductPage({
   let product: typeof products.$inferSelect | null = null;
   let recommended: (typeof products.$inferSelect)[] = [];
 
+  const decodedSlug = decodeURIComponent(slug);
+
   try {
     const result = await db
       .select()
       .from(products)
-      .where(eq(products.slug, slug))
+      .where(eq(products.slug, decodedSlug))
       .limit(1);
 
     if (result.length === 0) {
@@ -50,7 +52,8 @@ export default async function ProductPage({
         .limit(4 - recommended.length);
       recommended = [...recommended, ...more];
     }
-  } catch {
+  } catch (error) {
+    console.error("Database error in ProductPage:", error);
     notFound();
   }
 
