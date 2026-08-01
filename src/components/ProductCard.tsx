@@ -14,7 +14,8 @@ interface Product {
   images: string[];
   colors: { name: string; hex: string }[];
   sizes: string[];
-  isLimitedDrop: boolean;
+  tags?: string[];
+  isLimitedDrop?: boolean;
   category: string;
 }
 
@@ -34,14 +35,20 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
           src={product.images[imageIndex] || product.images[0]}
           alt={product.name}
           fill
-          className="object-contain p-4 transition-transform duration-700 group-hover:scale-105"
+          className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
         />
 
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
-          {product.isLimitedDrop && (
-            <span className="bg-black text-white text-[9px] font-bold tracking-[0.15em] px-3 py-1 rounded-full">
+          {product.tags && product.tags.map(tag => (
+            <span key={tag} className="bg-black/90 backdrop-blur-sm text-white text-[9px] font-bold tracking-[0.15em] px-3 py-1.5 rounded-full uppercase shadow-lg border border-white/10">
+              {tag}
+            </span>
+          ))}
+          {/* Fallback for legacy DB records */}
+          {!product.tags?.length && product.isLimitedDrop && (
+            <span className="bg-black/90 backdrop-blur-sm text-white text-[9px] font-bold tracking-[0.15em] px-3 py-1.5 rounded-full uppercase shadow-lg border border-white/10">
               LIMITED
             </span>
           )}

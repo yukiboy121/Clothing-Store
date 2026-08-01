@@ -11,6 +11,7 @@ export const products = pgTable("products", {
   images: jsonb("images").$type<string[]>().notNull().default([]),
   colors: jsonb("colors").$type<{ name: string; hex: string }[]>().notNull().default([]),
   sizes: jsonb("sizes").$type<string[]>().notNull().default([]),
+  tags: jsonb("tags").$type<string[]>().notNull().default([]),
   isLimitedDrop: boolean("is_limited_drop").notNull().default(false),
   dropEndsAt: timestamp("drop_ends_at"),
   inStock: boolean("in_stock").notNull().default(true),

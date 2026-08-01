@@ -14,7 +14,8 @@ interface Product {
   images: string[];
   colors: { name: string; hex: string }[];
   sizes: string[];
-  isLimitedDrop: boolean;
+  tags?: string[];
+  isLimitedDrop?: boolean;
   category: string;
 }
 
@@ -81,14 +82,21 @@ export function LatestDropSection({ products }: { products: Product[] }) {
             src={mainProduct.images[0]}
             alt={mainProduct.name}
             fill
-            className="object-contain p-12 transition-transform duration-[1.5s] ease-out group-hover:scale-105"
+            className="object-cover object-top transition-transform duration-[1.5s] ease-out group-hover:scale-105"
             sizes="(max-width: 1024px) 100vw, 60vw"
             priority
           />
-          <div className="absolute top-6 left-6 flex gap-3">
-            <span className="bg-black text-white text-[10px] font-bold tracking-[0.2em] px-4 py-2 uppercase">
-              Limited Edition
-            </span>
+          <div className="absolute top-6 left-6 flex gap-3 flex-wrap">
+            {mainProduct.tags && mainProduct.tags.map(tag => (
+              <span key={tag} className="bg-black/90 backdrop-blur-sm text-white text-[10px] font-bold tracking-[0.2em] px-4 py-2 uppercase border border-white/10">
+                {tag}
+              </span>
+            ))}
+            {!mainProduct.tags?.length && mainProduct.isLimitedDrop && (
+              <span className="bg-black/90 backdrop-blur-sm text-white text-[10px] font-bold tracking-[0.2em] px-4 py-2 uppercase border border-white/10">
+                Limited Edition
+              </span>
+            )}
             {mainProduct.comparePrice && (
               <span className="bg-emerald-400 text-black text-[10px] font-bold tracking-[0.2em] px-4 py-2 uppercase shadow-lg">
                 Sale
@@ -168,10 +176,15 @@ export function LatestDropSection({ products }: { products: Product[] }) {
                     src={prod.images[0]}
                     alt={prod.name}
                     fill
-                    className="object-contain p-8 group-hover:scale-105 transition-transform duration-700"
+                    className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
                   />
-                  <div className="absolute top-4 left-4">
-                     <span className="bg-black text-white text-[8px] font-bold tracking-widest px-2 py-1 uppercase">Limited</span>
+                  <div className="absolute top-4 left-4 flex flex-col gap-2">
+                     {prod.tags && prod.tags.map(tag => (
+                        <span key={tag} className="bg-black/90 backdrop-blur-sm text-white text-[8px] font-bold tracking-widest px-2 py-1 uppercase border border-white/10">{tag}</span>
+                     ))}
+                     {!prod.tags?.length && prod.isLimitedDrop && (
+                        <span className="bg-black/90 backdrop-blur-sm text-white text-[8px] font-bold tracking-widest px-2 py-1 uppercase border border-white/10">Limited</span>
+                     )}
                   </div>
                 </div>
                 <div className="p-6">

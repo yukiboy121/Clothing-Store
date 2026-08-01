@@ -52,6 +52,7 @@ interface Product {
   category: string;
   inStock: boolean;
   stockCount: number;
+  tags?: string[];
   isLimitedDrop?: boolean;
 }
 
@@ -88,7 +89,7 @@ export default function AdminDashboardPage() {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [newProduct, setNewProduct] = useState({
     name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies",
-    imageUrls: "", stockCount: "100", colors: "", sizes: "", isLimitedDrop: false
+    imageUrls: "", stockCount: "100", colors: "", sizes: "", tags: "", isLimitedDrop: false
   });
   const [savingProduct, setSavingProduct] = useState(false);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
@@ -308,6 +309,7 @@ export default function AdminDashboardPage() {
       }).filter(c => c.name) : [];
       
       const parsedSizes = newProduct.sizes ? newProduct.sizes.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) : [];
+      const parsedTags = newProduct.tags ? newProduct.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
 
       const body = {
         ...newProduct,
@@ -315,6 +317,7 @@ export default function AdminDashboardPage() {
         images: imagesArray.length > 0 ? imagesArray : ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800"],
         colors: parsedColors,
         sizes: parsedSizes,
+        tags: parsedTags,
       };
 
       const method = editingProductId ? "PATCH" : "POST";
@@ -331,7 +334,7 @@ export default function AdminDashboardPage() {
         } else {
           setProductsList([...productsList, data.product]);
         }
-        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: "", sizes: "", isLimitedDrop: false });
+        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: "", sizes: "", tags: "", isLimitedDrop: false });
         setEditingProductId(null);
       } else {
         alert(data.error);
@@ -588,17 +591,9 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 bg-white/5 p-4 rounded-xl border border-white/10">
-                  <input 
-                    type="checkbox" 
-                    id="isLimitedDrop" 
-                    checked={newProduct.isLimitedDrop} 
-                    onChange={(e) => setNewProduct({...newProduct, isLimitedDrop: e.target.checked})} 
-                    className="w-4 h-4 accent-[#00E5FF] cursor-pointer" 
-                  />
-                  <label htmlFor="isLimitedDrop" className="text-xs font-semibold tracking-wider text-white cursor-pointer">
-                    Add to "Latest Drop" (Limited Drop)
-                  </label>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Tags (Comma separated)</label>
+                  <input type="text" value={newProduct.tags} onChange={(e) => setNewProduct({...newProduct, tags: e.target.value})} className="w-full bg-black/40 border border-white/10 px-4 py-3 rounded-xl focus:border-white/40 outline-none transition-colors" placeholder="e.g. Latest Drop, Limited Edition, New" />
                 </div>
 
                 <div className="flex gap-4 mt-4">
@@ -610,7 +605,7 @@ export default function AdminDashboardPage() {
                       type="button" 
                       onClick={() => {
                         setEditingProductId(null);
-                        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: "", sizes: "", isLimitedDrop: false });
+                        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: "", sizes: "", tags: "", isLimitedDrop: false });
                       }}
                       className="px-8 py-4 bg-white/5 border border-white/10 text-white font-bold uppercase text-xs tracking-[0.2em] rounded-xl hover:bg-white/10 transition-colors"
                     >
@@ -673,6 +668,7 @@ export default function AdminDashboardPage() {
                                   stockCount: prod.stockCount.toString(),
                                   colors: (prod as any).colors?.map((c: any) => c.name).join(", ") || "",
                                   sizes: (prod as any).sizes?.join(", ") || "",
+                                  tags: (prod as any).tags?.join(", ") || "",
                                   isLimitedDrop: (prod as any).isLimitedDrop || false
                                 });
                                 window.scrollTo({ top: 0, behavior: 'smooth' });

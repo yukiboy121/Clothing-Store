@@ -25,7 +25,7 @@ export default async function HomePage() {
     limitedDrops = await db
       .select()
       .from(products)
-      .where(eq(products.isLimitedDrop, true))
+      .where(sql`${products.isLimitedDrop} = true OR ${products.tags} @> '["Latest Drop"]'::jsonb`)
       .orderBy(sql`${products.createdAt} DESC`)
       .limit(6);
   } catch {

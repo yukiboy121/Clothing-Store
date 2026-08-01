@@ -17,7 +17,8 @@ interface Product {
   images: string[];
   colors: { name: string; hex: string }[];
   sizes: string[];
-  isLimitedDrop: boolean;
+  tags?: string[];
+  isLimitedDrop?: boolean;
   dropEndsAt: Date | null;
   inStock: boolean;
   stockCount: number;
@@ -124,7 +125,7 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
                     src={product.images[selectedImage]}
                     alt={product.name}
                     fill
-                    className="object-cover transition-transform duration-300"
+                    className="object-cover object-top transition-transform duration-300"
                     style={
                       zoomed
                         ? {
@@ -141,13 +142,18 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
 
               {/* Badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
-                {product.isLimitedDrop && (
-                  <span className="bg-white text-void text-[9px] font-bold tracking-[0.15em] px-3 py-1.5">
+                {product.tags && product.tags.map(tag => (
+                  <span key={tag} className="bg-white/90 backdrop-blur-sm text-black text-[9px] font-bold tracking-[0.15em] px-3 py-1.5 rounded-full uppercase shadow-lg">
+                    {tag}
+                  </span>
+                ))}
+                {!product.tags?.length && product.isLimitedDrop && (
+                  <span className="bg-white/90 backdrop-blur-sm text-black text-[9px] font-bold tracking-[0.15em] px-3 py-1.5 rounded-full uppercase shadow-lg">
                     LIMITED DROP
                   </span>
                 )}
                 {product.comparePrice && (
-                  <span className="bg-red-600 text-white text-[9px] font-bold tracking-[0.15em] px-3 py-1.5">
+                  <span className="bg-[#00F0FF] text-black text-[9px] font-bold tracking-[0.15em] px-3 py-1.5 rounded-full uppercase shadow-lg">
                     SALE
                   </span>
                 )}

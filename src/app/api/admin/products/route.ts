@@ -40,6 +40,7 @@ export async function POST(req: Request) {
         images: data.images, // Array of URLs
         colors: data.colors || [], // Array of {name, hex}
         sizes: data.sizes || [], // Array of strings
+        tags: data.tags || [], // Array of strings
         isLimitedDrop: data.isLimitedDrop || false,
         dropEndsAt: data.dropEndsAt ? new Date(data.dropEndsAt) : null,
         inStock: data.inStock ?? true,
@@ -83,6 +84,7 @@ export async function PATCH(req: Request) {
         images: data.images, // Array of URLs
         colors: data.colors || [], // Array of {name, hex}
         sizes: data.sizes || [], // Array of strings
+        tags: data.tags || [], // Array of strings
         isLimitedDrop: data.isLimitedDrop || false,
         dropEndsAt: data.dropEndsAt ? new Date(data.dropEndsAt) : null,
         inStock: data.inStock ?? true,

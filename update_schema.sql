@@ -82,3 +82,5 @@ VALUES
   ('UNTER10', 10, NULL, 0, true),
   ('WELCOME500', NULL, 500, 2000, true)
 ON CONFLICT (code) DO NOTHING;
+
+ALTER TABLE "products" ADD COLUMN "tags" jsonb DEFAULT '[]'::jsonb NOT NULL;
