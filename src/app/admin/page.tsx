@@ -273,6 +273,23 @@ export default function AdminDashboardPage() {
     }
   };
 
+
+  const handleDeleteProduct = async (id: number, name: string) => {
+    if (!confirm(`Are you sure you want to permanently delete "${name}"? This cannot be undone.`)) return;
+    try {
+      const res = await fetch(`/api/admin/products?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (res.ok) {
+        setProductsList(productsList.filter(p => p.id !== id));
+      } else {
+        alert(data.error || "Failed to delete product.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("An error occurred while deleting.");
+    }
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     setUploadingImage(true);
@@ -798,31 +815,39 @@ export default function AdminDashboardPage() {
                             </span>
                           </td>
                           <td className="py-4 px-4 text-right">
-                            <button 
-                              onClick={() => {
-                                setEditingProductId(prod.id);
-                                setNewProduct({
-                                  name: prod.name,
-                                  slug: (prod as any).slug || "",
-                                  description: (prod as any).description || "",
-                                  price: prod.price.toString(),
-                                  comparePrice: (prod as any).comparePrice?.toString() || "",
-                                  category: prod.category,
-                                  imageUrls: (prod as any).images?.join(", ") || "",
-                                  stockCount: prod.stockCount.toString(),
-                                  colors: (prod as any).colors || [],
-                                  sizes: (prod as any).sizes || [],
-                                  tags: (prod as any).tags || [],
-                                  isLimitedDrop: (prod as any).isLimitedDrop || false
-                                });
-                                setCustomColorName("");
-                                setCustomColorHex("#ffffff");
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                              }}
-                              className="text-[10px] uppercase tracking-widest font-bold text-white/50 hover:text-white transition-colors"
-                            >
-                              Edit
-                            </button>
+                            <div className="flex items-center justify-end gap-4">
+                              <button 
+                                onClick={() => {
+                                  setEditingProductId(prod.id);
+                                  setNewProduct({
+                                    name: prod.name,
+                                    slug: (prod as any).slug || "",
+                                    description: (prod as any).description || "",
+                                    price: prod.price.toString(),
+                                    comparePrice: (prod as any).comparePrice?.toString() || "",
+                                    category: prod.category,
+                                    imageUrls: (prod as any).images?.join(", ") || "",
+                                    stockCount: prod.stockCount.toString(),
+                                    colors: (prod as any).colors || [],
+                                    sizes: (prod as any).sizes || [],
+                                    tags: (prod as any).tags || [],
+                                    isLimitedDrop: (prod as any).isLimitedDrop || false
+                                  });
+                                  setCustomColorName("");
+                                  setCustomColorHex("#ffffff");
+                                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                className="text-[10px] uppercase tracking-widest font-bold text-white/50 hover:text-white transition-colors"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteProduct(prod.id, prod.name)}
+                                className="text-[10px] uppercase tracking-widest font-bold text-red-500/60 hover:text-red-400 transition-colors"
+                              >
+                                Delete
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}

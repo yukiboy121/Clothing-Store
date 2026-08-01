@@ -104,3 +104,37 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: "Failed to update product." }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const isAdmin = await verifyAdminSession();
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "Product ID is required." }, { status: 400 });
+    }
+
+    const { eq } = require("drizzle-orm");
+    const [deleted] = await db
+      .delete(products)
+      .where(eq(products.id, parseInt(id)))
+      .returning();
+
+    if (!deleted) {
+      return NextResponse.json({ error: "Product not found." }, { status: 404 });
+    }
+
+    revalidatePath("/shop");
+    revalidatePath("/");
+
+    return NextResponse.json({ success: true, deleted });
+  } catch (error: any) {
+    console.error("Failed to delete product:", error);
+    return NextResponse.json({ error: "Failed to delete product." }, { status: 500 });
+  }
+}
