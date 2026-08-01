@@ -12,13 +12,42 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
     }
 
-    const { userId, role } = await req.json();
+    const body = await req.json();
+    const { userId, email, role } = body;
 
-    if (!userId || (role !== "admin" && role !== "user")) {
-      return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
+    if (role !== "admin" && role !== "user") {
+      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
-    // Don't allow changing one's own role to avoid locking oneself out
+    // --- Email-based role change ---
+    if (email) {
+      const normalizedEmail = email.trim().toLowerCase();
+      const [targetUser] = await db
+        .select({ id: users.id, email: users.email, name: users.name })
+        .from(users)
+        .where(eq(users.email, normalizedEmail))
+        .limit(1);
+
+      if (!targetUser) {
+        return NextResponse.json(
+          { error: `No user found with email: ${normalizedEmail}` },
+          { status: 404 }
+        );
+      }
+
+      if (targetUser.id === session.userId) {
+        return NextResponse.json({ error: "Cannot change your own role" }, { status: 400 });
+      }
+
+      await db.update(users).set({ role }).where(eq(users.id, targetUser.id));
+      return NextResponse.json({ success: true, role, user: { id: targetUser.id, name: targetUser.name, email: targetUser.email } });
+    }
+
+    // --- ID-based role change ---
+    if (!userId) {
+      return NextResponse.json({ error: "Provide either userId or email" }, { status: 400 });
+    }
+
     if (userId === session.userId) {
       return NextResponse.json({ error: "Cannot change your own role" }, { status: 400 });
     }

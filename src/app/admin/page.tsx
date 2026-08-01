@@ -108,6 +108,12 @@ export default function AdminDashboardPage() {
   const [reviewsList, setReviewsList] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
 
+  // State for Email-based Admin Grant
+  const [emailGrantInput, setEmailGrantInput] = useState("");
+  const [emailGrantRole, setEmailGrantRole] = useState("admin");
+  const [emailGrantLoading, setEmailGrantLoading] = useState(false);
+  const [emailGrantMsg, setEmailGrantMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
   useEffect(() => {
     if (!isLoading && (!user || user.role !== "admin")) {
       router.push("/");
@@ -188,6 +194,38 @@ export default function AdminDashboardPage() {
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleGrantAdminByEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedEmail = emailGrantInput.trim().toLowerCase();
+    if (!trimmedEmail) return;
+    setEmailGrantLoading(true);
+    setEmailGrantMsg(null);
+    try {
+      const res = await fetch("/api/admin/users/role", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmedEmail, role: emailGrantRole }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setEmailGrantMsg({
+          type: "success",
+          text: `✓ ${data.user?.name || trimmedEmail} is now ${emailGrantRole === "admin" ? "an Admin" : "a regular User"}.`,
+        });
+        setEmailGrantInput("");
+        // Refresh users list if already loaded
+        if (usersList.length > 0) fetchUsers();
+      } else {
+        setEmailGrantMsg({ type: "error", text: data.error || "Failed to update role" });
+      }
+    } catch (err) {
+      console.error(err);
+      setEmailGrantMsg({ type: "error", text: "An error occurred. Please try again." });
+    } finally {
+      setEmailGrantLoading(false);
     }
   };
 
@@ -986,46 +1024,114 @@ export default function AdminDashboardPage() {
 
           {/* TAB: SETTINGS */}
           {activeTab === "settings" && (
-            <div className="bg-neutral-900/40 border border-white/5 p-6 md:p-8 rounded-2xl max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <h2 className="text-xs font-semibold uppercase tracking-widest text-white/70 mb-6">Staff Access</h2>
-              {loadingUsers ? (
-                <p className="text-xs text-white/50">Loading users...</p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
-                    <thead>
-                      <tr className="border-b border-white/5 text-white/40 uppercase text-[9px] tracking-[0.2em]">
-                        <th className="py-4 px-4 font-semibold">Name</th>
-                        <th className="py-4 px-4 font-semibold">Email</th>
-                        <th className="py-4 px-4 font-semibold">Role</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                      {usersList.map((u) => (
-                        <tr key={u.id} className="hover:bg-white/5 transition-colors">
-                          <td className="py-4 px-4 text-white font-medium">{u.name}</td>
-                          <td className="py-4 px-4 text-white/60">{u.email}</td>
-                          <td className="py-4 px-4">
-                            <select
-                              value={u.role}
-                              onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                              disabled={u.id === user.id}
-                              className={`bg-black border rounded-lg px-3 py-1.5 text-[10px] uppercase font-bold tracking-widest focus:outline-none transition-colors ${
-                                u.role === 'admin' 
-                                  ? 'border-amber-400/30 text-amber-400' 
-                                  : 'border-white/10 text-white/70'
-                              }`}
-                            >
-                              <option value="user">User</option>
-                              <option value="admin">Admin</option>
-                            </select>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+            <div className="space-y-8 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+              {/* Grant Admin by Email */}
+              <div className="bg-neutral-900/40 border border-white/5 p-6 md:p-8 rounded-2xl">
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-bold uppercase tracking-widest text-white">Grant Role by Email</h2>
+                    <p className="text-[11px] text-white/40 mt-1 tracking-wide">Type a registered Gmail / email to instantly promote or demote that account.</p>
+                  </div>
                 </div>
-              )}
+
+                <form onSubmit={handleGrantAdminByEmail} className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    id="email-grant-input"
+                    type="email"
+                    required
+                    value={emailGrantInput}
+                    onChange={(e) => { setEmailGrantInput(e.target.value); setEmailGrantMsg(null); }}
+                    placeholder="user@gmail.com"
+                    className="flex-1 bg-black/50 border border-white/10 px-4 py-3 rounded-xl text-sm focus:border-amber-400/50 outline-none transition-colors placeholder:text-white/20"
+                  />
+                  <select
+                    id="email-grant-role-select"
+                    value={emailGrantRole}
+                    onChange={(e) => setEmailGrantRole(e.target.value)}
+                    className="bg-black/50 border border-white/10 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-widest focus:border-amber-400/50 outline-none transition-colors text-amber-400"
+                  >
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                  </select>
+                  <button
+                    id="email-grant-submit"
+                    type="submit"
+                    disabled={emailGrantLoading}
+                    className="px-8 py-3 bg-amber-400 text-black font-bold uppercase text-xs tracking-[0.15em] rounded-xl hover:bg-amber-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  >
+                    {emailGrantLoading ? "Updating..." : "Grant Role"}
+                  </button>
+                </form>
+
+                {emailGrantMsg && (
+                  <div className={`mt-4 px-4 py-3 rounded-xl text-xs font-semibold tracking-wide ${
+                    emailGrantMsg.type === "success"
+                      ? "bg-emerald-400/10 border border-emerald-400/20 text-emerald-400"
+                      : "bg-red-400/10 border border-red-400/20 text-red-400"
+                  }`}>
+                    {emailGrantMsg.text}
+                  </div>
+                )}
+              </div>
+
+              {/* Existing Users Table */}
+              <div className="bg-neutral-900/40 border border-white/5 p-6 md:p-8 rounded-2xl">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xs font-semibold uppercase tracking-widest text-white/70">Registered Users</h2>
+                  <button onClick={fetchUsers} className="text-[10px] uppercase tracking-widest text-white/50 hover:text-white transition-colors">
+                    Refresh
+                  </button>
+                </div>
+                {loadingUsers ? (
+                  <p className="text-xs text-white/50">Loading users...</p>
+                ) : usersList.length === 0 ? (
+                  <p className="text-xs text-white/50">No registered users found.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs border-collapse whitespace-nowrap">
+                      <thead>
+                        <tr className="border-b border-white/5 text-white/40 uppercase text-[9px] tracking-[0.2em]">
+                          <th className="py-4 px-4 font-semibold">Name</th>
+                          <th className="py-4 px-4 font-semibold">Email</th>
+                          <th className="py-4 px-4 font-semibold">Joined</th>
+                          <th className="py-4 px-4 font-semibold">Role</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {usersList.map((u) => (
+                          <tr key={u.id} className="hover:bg-white/5 transition-colors">
+                            <td className="py-4 px-4 text-white font-medium">{u.name}</td>
+                            <td className="py-4 px-4 text-white/60">{u.email}</td>
+                            <td className="py-4 px-4 text-white/40">{new Date(u.createdAt).toLocaleDateString()}</td>
+                            <td className="py-4 px-4">
+                              <select
+                                value={u.role}
+                                onChange={(e) => handleRoleChange(u.id, e.target.value)}
+                                disabled={u.id === user.id}
+                                className={`bg-black border rounded-lg px-3 py-1.5 text-[10px] uppercase font-bold tracking-widest focus:outline-none transition-colors cursor-pointer ${
+                                  u.role === 'admin'
+                                    ? 'border-amber-400/30 text-amber-400'
+                                    : 'border-white/10 text-white/70'
+                                } ${u.id === user.id ? 'opacity-40 cursor-not-allowed' : 'hover:border-white/30'}`}
+                              >
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                              </select>
+                              {u.id === user.id && (
+                                <span className="ml-2 text-[9px] text-white/30 uppercase tracking-widest">You</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
