@@ -23,6 +23,13 @@ export default function CheckoutPage() {
     notes: "",
   });
 
+  const [cardData, setCardData] = useState({
+    cardNumber: "",
+    expiry: "",
+    cvc: "",
+    cardName: "",
+  });
+
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "CARD">("COD");
   const [couponCode, setCouponCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
@@ -83,6 +90,24 @@ export default function CheckoutPage() {
 
     setLoading(true);
     setError("");
+
+    // Simulate Fake Card Payment Validation
+    if (paymentMethod === "CARD") {
+      const sanitizedCardNumber = cardData.cardNumber.replace(/\s/g, "");
+      if (sanitizedCardNumber !== "4242424242424242") {
+        setError("Payment Failed: Invalid Card Number. Please use the test card provided.");
+        setLoading(false);
+        return;
+      }
+      if (!cardData.expiry || !cardData.cvc || !cardData.cardName) {
+        setError("Payment Failed: Please fill in all card details.");
+        setLoading(false);
+        return;
+      }
+      
+      // Simulate 1.5 second processing delay for realism
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+    }
 
     try {
       const res = await fetch("/api/orders", {
@@ -291,28 +316,93 @@ export default function CheckoutPage() {
                 </div>
               </label>
 
-              <label
-                onClick={() => setPaymentMethod("CARD")}
-                className={`cursor-pointer p-4 rounded-xl border transition-all ${
+              <div className={`rounded-xl border transition-all ${
                   paymentMethod === "CARD"
-                    ? "border-white bg-white/10"
+                    ? "border-white bg-white/5"
                     : "border-white/10 bg-black/30 hover:border-white/30"
-                }`}
-              >
-                <div className="flex items-center gap-3">
+                }`}>
+                <label
+                  onClick={() => setPaymentMethod("CARD")}
+                  className="cursor-pointer p-4 flex items-start gap-3 w-full"
+                >
                   <input
                     type="radio"
                     name="payment"
                     checked={paymentMethod === "CARD"}
                     onChange={() => setPaymentMethod("CARD")}
-                    className="accent-white"
+                    className="accent-white mt-1"
                   />
-                  <div>
-                    <p className="text-xs font-semibold uppercase text-white">Credit / Debit Card</p>
-                    <p className="text-[11px] text-white/50 mt-1">Instant approval simulation</p>
+                  <div className="w-full">
+                    <p className="text-xs font-semibold uppercase text-white mb-1.5">Bank card / Bank Account - OnePay</p>
+                    {/* Logos Container */}
+                    <div className="flex flex-wrap items-center gap-2 bg-white rounded-lg p-2 max-w-fit mb-2">
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa" className="h-4 object-contain" />
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-4 object-contain ml-2" />
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" className="h-4 object-contain ml-2" />
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Discover_Card_logo.svg" alt="Discover" className="h-3 object-contain ml-2" />
+                    </div>
+                    <p className="text-[11px] text-white/50">Pay by Visa, MasterCard, AMEX, or Lanka QR via OnePay.</p>
                   </div>
-                </div>
-              </label>
+                </label>
+
+                {/* Card Details Form - Only visible when CARD is selected */}
+                <AnimatePresence>
+                  {paymentMethod === "CARD" && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden border-t border-white/10"
+                    >
+                      <div className="p-4 space-y-4">
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-white/70 mb-1.5">Card Number</label>
+                          <input
+                            type="text"
+                            placeholder="4242 4242 4242 4242"
+                            value={cardData.cardNumber}
+                            onChange={(e) => setCardData({ ...cardData, cardNumber: e.target.value })}
+                            className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-white"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-[10px] uppercase tracking-wider text-white/70 mb-1.5">Expiry Date</label>
+                            <input
+                              type="text"
+                              placeholder="MM/YY"
+                              value={cardData.expiry}
+                              onChange={(e) => setCardData({ ...cardData, expiry: e.target.value })}
+                              className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase tracking-wider text-white/70 mb-1.5">CVC</label>
+                            <input
+                              type="text"
+                              placeholder="123"
+                              maxLength={4}
+                              value={cardData.cvc}
+                              onChange={(e) => setCardData({ ...cardData, cvc: e.target.value })}
+                              className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-white"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-white/70 mb-1.5">Name on Card</label>
+                          <input
+                            type="text"
+                            placeholder="Kasun Perera"
+                            value={cardData.cardName}
+                            onChange={(e) => setCardData({ ...cardData, cardName: e.target.value })}
+                            className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-white"
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </div>
