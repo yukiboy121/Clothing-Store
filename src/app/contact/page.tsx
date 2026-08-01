@@ -11,7 +11,7 @@ export default function ContactPage() {
         
         <div className="space-y-2 p-6 bg-neutral-900/40 border border-white/10 rounded-2xl">
           <p className="text-xs uppercase tracking-widest text-white/50">Email</p>
-          <p className="text-lg font-semibold text-white">support@untergrund.com</p>
+          <p className="text-lg font-semibold text-white">support@dragongrouplk.com</p>
         </div>
         
         <div className="space-y-2 p-6 bg-neutral-900/40 border border-white/10 rounded-2xl">

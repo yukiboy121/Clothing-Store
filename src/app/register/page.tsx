@@ -62,7 +62,7 @@ export default function RegisterPage() {
       >
         <div className="text-center mb-8">
           <h1 className="font-heading text-3xl md:text-4xl tracking-wider text-white mb-2">
-            JOIN UNTERGRUND
+            JOIN DRAGON GROUP LK
           </h1>
           <p className="text-xs text-white/50 tracking-widest uppercase">
             Create an account for seamless shopping & order tracking

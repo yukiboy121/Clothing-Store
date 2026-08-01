@@ -423,7 +423,7 @@ export default function AdminDashboardPage() {
             <h1 className="font-heading text-3xl md:text-5xl tracking-wider capitalize">
               {activeTab === "settings" ? "User Roles" : activeTab}
             </h1>
-            <p className="text-white/40 text-xs tracking-widest uppercase mt-2">Manage your UNTERGRUND store</p>
+            <p className="text-white/40 text-xs tracking-widest uppercase mt-2">Manage your Dragon Group LK store</p>
           </div>
 
           {/* TAB: DASHBOARD */}

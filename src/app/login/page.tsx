@@ -53,7 +53,7 @@ export default function LoginPage() {
             WELCOME BACK
           </h1>
           <p className="text-xs text-white/50 tracking-widest uppercase">
-            Sign in to your UNTERGRUND account
+            Sign in to your Dragon Group LK account
           </p>
         </div>
 

@@ -25,8 +25,8 @@ export function AboutSection() {
           transition={{ delay: 0.3, duration: 0.8 }}
           className="mt-8 md:mt-12 text-white/40 text-sm md:text-base max-w-2xl mx-auto leading-relaxed"
         >
-          Born from the underground scenes of Melbourne. Inspired by the grit of Australian rap,
-          the edge of trapping culture, and the precision of luxury fashion. Every piece is designed
+          Born from the underground scenes of Sri Lanka. Inspired by the grit of local rap,
+          the edge of street culture, and the precision of luxury fashion. Every piece is designed
           for the ones who create their own lane. Limited runs. Premium materials. No compromises.
         </motion.p>
 

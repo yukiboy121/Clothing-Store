@@ -1,7 +1,7 @@
 "use client";
 
 export function MarqueeStrip() {
-  const text = "LIMITED DROP • PREMIUM QUALITY • WORLDWIDE SHIPPING • EST. 2026 • MELBOURNE UNDERGROUND • NO RESTOCKS • ";
+  const text = "LIMITED DROP • PREMIUM QUALITY • WORLDWIDE SHIPPING • EST. 2026 • DRAGON GROUP LK • SRI LANKA UNDERGROUND • NO RESTOCKS • ";
 
   return (
     <div className="bg-white text-void py-3 overflow-hidden">
