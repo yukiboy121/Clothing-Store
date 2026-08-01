@@ -79,6 +79,8 @@ export default function AdminDashboardPage() {
     imageUrls: "", stockCount: "100"
   });
   const [savingProduct, setSavingProduct] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<number | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     if (!isLoading && (!user || user.role !== "admin")) {
@@ -215,6 +217,34 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    setUploadingImage(true);
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const currentUrls = newProduct.imageUrls ? newProduct.imageUrls + ", " : "";
+        setNewProduct({ ...newProduct, imageUrls: currentUrls + data.url });
+      } else {
+        alert(data.error || "Failed to upload");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload image.");
+    } finally {
+      setUploadingImage(false);
+      e.target.value = ""; // Reset input
+    }
+  };
+
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingProduct(true);
@@ -222,19 +252,26 @@ export default function AdminDashboardPage() {
       const imagesArray = newProduct.imageUrls.split(",").map((url) => url.trim()).filter(Boolean);
       const body = {
         ...newProduct,
+        id: editingProductId,
         images: imagesArray.length > 0 ? imagesArray : ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800"],
       };
 
+      const method = editingProductId ? "PATCH" : "POST";
       const res = await fetch("/api/admin/products", {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
       const data = await res.json();
       if (res.ok) {
-        alert("Product Added Successfully!");
-        setProductsList([...productsList, data.product]);
+        alert(editingProductId ? "Product Updated Successfully!" : "Product Added Successfully!");
+        if (editingProductId) {
+          setProductsList(productsList.map(p => p.id === editingProductId ? data.product : p));
+        } else {
+          setProductsList([...productsList, data.product]);
+        }
         setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100" });
+        setEditingProductId(null);
       } else {
         alert(data.error);
       }
@@ -244,6 +281,7 @@ export default function AdminDashboardPage() {
       setSavingProduct(false);
     }
   };
+
 
   if (isLoading || !user || user.role !== "admin") {
     return (
@@ -414,7 +452,9 @@ export default function AdminDashboardPage() {
           {activeTab === "products" && (
             <>
             <div className="bg-neutral-900/40 border border-white/5 p-6 md:p-8 rounded-2xl max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <h2 className="text-xs font-semibold uppercase tracking-widest text-white/70 mb-8">Add to Catalog</h2>
+              <h2 className="text-xs font-semibold uppercase tracking-widest text-white/70 mb-8">
+                {editingProductId ? "Edit Product" : "Add to Catalog"}
+              </h2>
               <form onSubmit={handleAddProduct} className="space-y-5 text-sm">
                 <div className="grid grid-cols-2 gap-5">
                   <div className="space-y-1.5">
@@ -454,13 +494,40 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Image URLs</label>
-                  <input required type="text" value={newProduct.imageUrls} onChange={(e) => setNewProduct({...newProduct, imageUrls: e.target.value})} className="w-full bg-black/40 border border-white/10 px-4 py-3 rounded-xl focus:border-white/40 outline-none transition-colors" placeholder="https://image1.jpg, https://image2.jpg" />
+                  <label className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Image URLs or Upload</label>
+                  <div className="flex flex-col gap-3">
+                    <input type="text" value={newProduct.imageUrls} onChange={(e) => setNewProduct({...newProduct, imageUrls: e.target.value})} className="w-full bg-black/40 border border-white/10 px-4 py-3 rounded-xl focus:border-white/40 outline-none transition-colors" placeholder="https://image1.jpg, https://image2.jpg" />
+                    <div className="flex items-center gap-4">
+                      <span className="text-[10px] uppercase text-white/40 font-bold">OR</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleImageUpload} 
+                        disabled={uploadingImage}
+                        className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20"
+                      />
+                      {uploadingImage && <span className="text-[10px] text-emerald-400 animate-pulse">Uploading...</span>}
+                    </div>
+                  </div>
                 </div>
 
-                <button disabled={savingProduct} type="submit" className="w-full py-4 mt-4 bg-white text-black font-bold uppercase text-xs tracking-[0.2em] rounded-xl hover:bg-neutral-200 transition-colors">
-                  {savingProduct ? "Publishing..." : "Publish Product"}
-                </button>
+                <div className="flex gap-4 mt-4">
+                  <button disabled={savingProduct || uploadingImage} type="submit" className="flex-1 py-4 bg-white text-black font-bold uppercase text-xs tracking-[0.2em] rounded-xl hover:bg-neutral-200 transition-colors">
+                    {savingProduct ? "Saving..." : (editingProductId ? "Update Product" : "Publish Product")}
+                  </button>
+                  {editingProductId && (
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setEditingProductId(null);
+                        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100" });
+                      }}
+                      className="px-8 py-4 bg-white/5 border border-white/10 text-white font-bold uppercase text-xs tracking-[0.2em] rounded-xl hover:bg-white/10 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
               </form>
             </div>
 
@@ -486,6 +553,7 @@ export default function AdminDashboardPage() {
                         <th className="py-4 px-4 font-semibold">Price</th>
                         <th className="py-4 px-4 font-semibold">Stock</th>
                         <th className="py-4 px-4 font-semibold">Status</th>
+                        <th className="py-4 px-4 font-semibold text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
@@ -499,6 +567,27 @@ export default function AdminDashboardPage() {
                             <span className={`px-2 py-1 rounded text-[9px] uppercase tracking-wider font-bold ${prod.inStock ? 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20' : 'bg-red-400/10 text-red-400'}`}>
                               {prod.inStock ? 'In Stock' : 'Out of Stock'}
                             </span>
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <button 
+                              onClick={() => {
+                                setEditingProductId(prod.id);
+                                setNewProduct({
+                                  name: prod.name,
+                                  slug: (prod as any).slug || "",
+                                  description: (prod as any).description || "",
+                                  price: prod.price.toString(),
+                                  comparePrice: (prod as any).comparePrice?.toString() || "",
+                                  category: prod.category,
+                                  imageUrls: (prod as any).images?.join(", ") || "",
+                                  stockCount: prod.stockCount.toString()
+                                });
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="text-[10px] uppercase tracking-widest font-bold text-white/50 hover:text-white transition-colors"
+                            >
+                              Edit
+                            </button>
                           </td>
                         </tr>
                       ))}
