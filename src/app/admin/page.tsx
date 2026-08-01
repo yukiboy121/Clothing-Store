@@ -52,6 +52,7 @@ interface Product {
   category: string;
   inStock: boolean;
   stockCount: number;
+  isLimitedDrop?: boolean;
 }
 
 interface Review {
@@ -87,7 +88,7 @@ export default function AdminDashboardPage() {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [newProduct, setNewProduct] = useState({
     name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies",
-    imageUrls: "", stockCount: "100", colors: "", sizes: ""
+    imageUrls: "", stockCount: "100", colors: "", sizes: "", isLimitedDrop: false
   });
   const [savingProduct, setSavingProduct] = useState(false);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
@@ -583,6 +584,19 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
+                <div className="flex items-center gap-3 bg-white/5 p-4 rounded-xl border border-white/10">
+                  <input 
+                    type="checkbox" 
+                    id="isLimitedDrop" 
+                    checked={newProduct.isLimitedDrop} 
+                    onChange={(e) => setNewProduct({...newProduct, isLimitedDrop: e.target.checked})} 
+                    className="w-4 h-4 accent-[#00E5FF] cursor-pointer" 
+                  />
+                  <label htmlFor="isLimitedDrop" className="text-xs font-semibold tracking-wider text-white cursor-pointer">
+                    Add to "Latest Drop" (Limited Drop)
+                  </label>
+                </div>
+
                 <div className="flex gap-4 mt-4">
                   <button disabled={savingProduct || uploadingImage} type="submit" className="flex-1 py-4 bg-white text-black font-bold uppercase text-xs tracking-[0.2em] rounded-xl hover:bg-neutral-200 transition-colors">
                     {savingProduct ? "Saving..." : (editingProductId ? "Update Product" : "Publish Product")}
@@ -592,7 +606,7 @@ export default function AdminDashboardPage() {
                       type="button" 
                       onClick={() => {
                         setEditingProductId(null);
-                        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: "", sizes: "" });
+                        setNewProduct({ name: "", slug: "", description: "", price: "", comparePrice: "", category: "Hoodies", imageUrls: "", stockCount: "100", colors: "", sizes: "", isLimitedDrop: false });
                       }}
                       className="px-8 py-4 bg-white/5 border border-white/10 text-white font-bold uppercase text-xs tracking-[0.2em] rounded-xl hover:bg-white/10 transition-colors"
                     >
@@ -654,7 +668,8 @@ export default function AdminDashboardPage() {
                                   imageUrls: (prod as any).images?.join(", ") || "",
                                   stockCount: prod.stockCount.toString(),
                                   colors: (prod as any).colors?.map((c: any) => c.name).join(", ") || "",
-                                  sizes: (prod as any).sizes?.join(", ") || ""
+                                  sizes: (prod as any).sizes?.join(", ") || "",
+                                  isLimitedDrop: (prod as any).isLimitedDrop || false
                                 });
                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                               }}

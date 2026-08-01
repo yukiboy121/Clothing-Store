@@ -27,7 +27,7 @@ export default async function HomePage() {
       .from(products)
       .where(eq(products.isLimitedDrop, true))
       .orderBy(sql`${products.createdAt} DESC`)
-      .limit(4);
+      .limit(6);
   } catch {
     // DB may not be seeded yet
   }
@@ -37,8 +37,8 @@ export default async function HomePage() {
       <HeroSection />
       <MarqueeStrip />
       <CollectionsSection />
-      <LatestDropSection products={limitedDrops.length > 0 ? limitedDrops : featuredProducts.slice(0, 4)} />
-      <LatestGearSection products={featuredProducts.length > 4 ? featuredProducts.slice(4) : featuredProducts} />
+      <LatestDropSection products={limitedDrops.length > 0 ? limitedDrops : featuredProducts.slice(0, 6)} />
+      <LatestGearSection products={featuredProducts.length > 6 ? featuredProducts.slice(6) : featuredProducts} />
       <ServicesOverviewSection />
       <AboutSection />
       <TestimonialsSection />

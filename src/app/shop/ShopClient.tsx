@@ -76,7 +76,7 @@ export function ShopClient({ initialProducts, categories }: ShopClientProps) {
       filtered = filtered.filter((p) => selectedCategories.includes(p.category));
     }
 
-    const min = parseFloat(minPrice) || 0;
+    const min = 0;
     const max = parseFloat(maxPrice) || Infinity;
     filtered = filtered.filter((p) => p.price >= min && p.price <= max);
 
@@ -123,11 +123,14 @@ export function ShopClient({ initialProducts, categories }: ShopClientProps) {
 
   const clearAll = () => {
     setSelectedCategories([]);
-    setMinPrice("0");
-    setMaxPrice("50000");
+    setMaxPrice(maxPriceLimit.toString());
     setSelectedColors([]);
     setSelectedSizes([]);
   };
+
+  const maxPriceLimit = useMemo(() => {
+    return initialProducts.length > 0 ? Math.max(...initialProducts.map(p => p.price)) : 50000;
+  }, [initialProducts]);
 
   // Helper to get count
   const getCategoryCount = (cat: string) => initialProducts.filter(p => p.category === cat).length;
@@ -143,7 +146,7 @@ export function ShopClient({ initialProducts, categories }: ShopClientProps) {
         {sections.categories && (
           <div className="space-y-3">
             {categories.map(cat => (
-              <label key={cat} className="flex items-center justify-between cursor-pointer group text-sm">
+              <label key={cat} onClick={() => toggleCategory(cat)} className="flex items-center justify-between cursor-pointer group text-sm">
                 <div className="flex items-center gap-3">
                   <div className={`w-4 h-4 border flex items-center justify-center transition-colors ${selectedCategories.includes(cat) ? 'bg-white border-white' : 'border-white/20 group-hover:border-white/50'}`}>
                     {selectedCategories.includes(cat) && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>}
@@ -164,21 +167,20 @@ export function ShopClient({ initialProducts, categories }: ShopClientProps) {
           {sections.price ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </button>
         {sections.price && (
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
-              <label className="text-[10px] text-white/50 uppercase tracking-widest block mb-1">Min Price</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-xs">Rs.</span>
-                <input type="number" value={minPrice} onChange={e => setMinPrice(e.target.value)} className="w-full bg-black/40 border border-white/10 rounded px-3 py-2 pl-8 text-sm focus:outline-none focus:border-white/30 transition-colors" />
-              </div>
+          <div className="pt-2">
+            <div className="flex justify-between text-xs text-white/50 tracking-wider mb-4">
+              <span>Rs. 0</span>
+              <span className="text-white">Rs. {maxPrice}</span>
             </div>
-            <div className="flex-1">
-              <label className="text-[10px] text-white/50 uppercase tracking-widest block mb-1">Max Price</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-xs">Rs.</span>
-                <input type="number" value={maxPrice} onChange={e => setMaxPrice(e.target.value)} className="w-full bg-black/40 border border-white/10 rounded px-3 py-2 pl-8 text-sm focus:outline-none focus:border-white/30 transition-colors" />
-              </div>
-            </div>
+            <input 
+              type="range" 
+              min="0" 
+              max={maxPriceLimit} 
+              step="100"
+              value={maxPrice} 
+              onChange={e => setMaxPrice(e.target.value)} 
+              className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-[#00E5FF]" 
+            />
           </div>
         )}
       </div>

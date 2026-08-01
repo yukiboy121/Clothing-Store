@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-void: #050505;
+  --color-void: #050814;
   --color-abyss: #111111;
   --color-silver: #C0C0C0;
   --color-chrome: #808080;
@@ -22,7 +22,7 @@ html {
 
 body {
   font-family: var(--font-body);
-  background: #050505;
+  background: #050814;
   color: #ffffff;
   overflow-x: hidden;
 }
@@ -37,7 +37,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #050505;
+  background: #050814;
 }
 
 ::-webkit-scrollbar-thumb {
