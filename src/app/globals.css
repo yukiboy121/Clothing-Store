@@ -162,6 +162,36 @@ body {
     0 28px 54px rgba(0, 0, 0, 0.14);
 }
 
+/* Simple dark blurred navbar surface.  This override deliberately removes the
+   liquid-glass decoration above without changing the navigation layout. */
+.nav-glass {
+  background: rgba(4, 7, 13, 0.70);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 0;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.24);
+  transition: background 300ms ease, backdrop-filter 300ms ease, box-shadow 300ms ease;
+}
+
+.nav-glass::before,
+.nav-glass::after {
+  content: none;
+}
+
+.nav-glass:hover {
+  background: rgba(4, 7, 13, 0.74);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.26);
+}
+
+.nav-glass-scrolled {
+  background: rgba(4, 7, 13, 0.78);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.30);
+}
+
 /* Dropdown panels use the same material but are their own stacking context. */
 .nav-dropdown {
   background: linear-gradient(135deg, rgba(37, 38, 52, 0.88), rgba(8, 10, 19, 0.86));
