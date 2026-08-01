@@ -57,3 +57,48 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Failed to add product." }, { status: 500 });
   }
 }
+
+export async function PATCH(req: Request) {
+  try {
+    const isAdmin = await verifyAdminSession();
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
+    }
+
+    const data = await req.json();
+    
+    if (!data.id) {
+      return NextResponse.json({ error: "Product ID is required for updating." }, { status: 400 });
+    }
+
+    const [updatedProduct] = await db
+      .update(products)
+      .set({
+        name: data.name,
+        slug: data.slug,
+        description: data.description,
+        price: parseFloat(data.price),
+        comparePrice: data.comparePrice ? parseFloat(data.comparePrice) : null,
+        category: data.category,
+        images: data.images, // Array of URLs
+        colors: data.colors || [], // Array of {name, hex}
+        sizes: data.sizes || [], // Array of strings
+        isLimitedDrop: data.isLimitedDrop || false,
+        dropEndsAt: data.dropEndsAt ? new Date(data.dropEndsAt) : null,
+        inStock: data.inStock ?? true,
+        stockCount: parseInt(data.stockCount) || 100,
+        featured: data.featured || false,
+      })
+      .where(require('drizzle-orm').eq(products.id, data.id))
+      .returning();
+
+    revalidatePath("/shop");
+    revalidatePath("/");
+    revalidatePath(`/product/${data.slug}`);
+
+    return NextResponse.json({ success: true, product: updatedProduct });
+  } catch (error: any) {
+    console.error("Failed to update product:", error);
+    return NextResponse.json({ error: "Failed to update product." }, { status: 500 });
+  }
+}
