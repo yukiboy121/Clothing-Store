@@ -38,7 +38,7 @@ export function HeroSection() {
             transition={{ delay: 0.3, duration: 0.8 }}
             className="text-[10px] md:text-xs tracking-[0.4em] text-white/50 mb-6 md:mb-8"
           >
-            EST. 2026 — MELBOURNE, AUSTRALIA
+            EST. 2026 — COLOMBO, SRI LANKA
           </motion.p>
 
           <h1 className="font-heading text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] leading-[0.9] tracking-wider">
@@ -48,7 +48,7 @@ export function HeroSection() {
               transition={{ delay: 0.2, duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
               className="block"
             >
-              BUILT FOR
+              WEAR YOUR
             </motion.span>
             <motion.span
               initial={{ opacity: 0, y: 80 }}
@@ -56,7 +56,7 @@ export function HeroSection() {
               transition={{ delay: 0.4, duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
               className="block gradient-text"
             >
-              THE UNDERGROUND
+              STRENGTH
             </motion.span>
           </h1>
 
@@ -67,7 +67,7 @@ export function HeroSection() {
             className="mt-8 md:mt-12 space-y-2"
           >
             <p className="text-sm md:text-base text-white/50 tracking-[0.15em] font-light">
-              Limited Drops. Premium Quality. No Restocks.
+              Crafted For Those Who Push Boundaries. Discover High-Performance Apparel Engineered For Excellence.
             </p>
           </motion.div>
 
