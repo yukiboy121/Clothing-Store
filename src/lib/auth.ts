@@ -130,3 +130,24 @@ export async function clearSessionCookie() {
     maxAge: 0,
   });
 }
+
+import { db } from "@/db";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
+
+export async function verifyAdminSession(): Promise<boolean> {
+  const session = await getSessionUser();
+  if (!session) return false;
+
+  const [dbUser] = await db
+    .select({ role: users.role })
+    .from(users)
+    .where(eq(users.id, session.userId))
+    .limit(1);
+
+  if (!dbUser || dbUser.role !== "admin") {
+    return false;
+  }
+  return true;
+}
+

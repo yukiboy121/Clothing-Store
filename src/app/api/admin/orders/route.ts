@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { orders } from "@/db/schema";
-import { getSessionUser } from "@/lib/auth";
+import { verifyAdminSession } from "@/lib/auth";
 import { eq } from "drizzle-orm";
 
 export async function PATCH(req: Request) {
   try {
-    const session = await getSessionUser();
-    if (!session || session.role !== "admin") {
+    const isAdmin = await verifyAdminSession();
+    if (!isAdmin) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
     }
 

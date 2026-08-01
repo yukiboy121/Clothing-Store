@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { coupons } from "@/db/schema";
-import { getSessionUser } from "@/lib/auth";
+import { verifyAdminSession } from "@/lib/auth";
 
 export async function GET(req: Request) {
   try {
-    const session = await getSessionUser();
-    if (!session || session.role !== "admin") {
+    const isAdmin = await verifyAdminSession();
+    if (!isAdmin) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
     }
 
@@ -19,8 +19,8 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const session = await getSessionUser();
-    if (!session || session.role !== "admin") {
+    const isAdmin = await verifyAdminSession();
+    if (!isAdmin) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
     }
 
