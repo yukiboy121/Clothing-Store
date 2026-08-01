@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cart";
 import { ProductCard } from "@/components/ProductCard";
@@ -121,11 +120,11 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
                   transition={{ duration: 0.3 }}
                   className="relative w-full h-full"
                 >
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={product.images[selectedImage]}
                     alt={product.name}
-                    fill
-                    className="object-cover object-top transition-transform duration-300"
+                    className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-300"
                     style={
                       zoomed
                         ? {
@@ -134,8 +133,6 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
                           }
                         : undefined
                     }
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    priority
                   />
                 </motion.div>
               </AnimatePresence>
@@ -170,7 +167,8 @@ export function ProductDetail({ product, recommended }: { product: Product; reco
                     selectedImage === i ? "border-white/40 ring-1 ring-white/40" : "border-white/5 opacity-50 hover:opacity-100"
                   }`}
                 >
-                  <Image src={img} alt={`${product.name} ${i + 1}`} fill className="object-cover" sizes="80px" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img} alt={`${product.name} ${i + 1}`} className="absolute inset-0 w-full h-full object-cover object-top" />
                 </button>
               ))}
             </div>

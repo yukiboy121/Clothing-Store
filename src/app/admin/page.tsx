@@ -322,10 +322,15 @@ export default function AdminDashboardPage() {
     e.preventDefault();
     setSavingProduct(true);
     try {
+      const imagesArray = newProduct.imageUrls
+        .split(",")
+        .map(u => u.trim())
+        .filter(Boolean);
+
       const body = {
         ...newProduct,
         id: editingProductId,
-        images: newProduct.imageUrls.length > 0 ? newProduct.imageUrls : ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800"],
+        images: imagesArray.length > 0 ? imagesArray : ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800"],
         colors: newProduct.colors,
         sizes: newProduct.sizes,
         tags: newProduct.tags,

@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -78,13 +77,11 @@ export function LatestDropSection({ products }: { products: Product[] }) {
       >
         {/* Left Side: Product Image (Takes up 60% on large screens) */}
         <Link href={`/product/${mainProduct.slug}`} className="relative w-full lg:w-[60%] aspect-square lg:aspect-auto bg-white lg:min-h-[600px] overflow-hidden">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={mainProduct.images[0]}
             alt={mainProduct.name}
-            fill
-            className="object-cover object-top transition-transform duration-[1.5s] ease-out group-hover:scale-105"
-            sizes="(max-width: 1024px) 100vw, 60vw"
-            priority
+            className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-[1.5s] ease-out group-hover:scale-105"
           />
           <div className="absolute top-6 left-6 flex gap-3 flex-wrap">
             {mainProduct.tags && mainProduct.tags.map(tag => (
@@ -172,11 +169,11 @@ export function LatestDropSection({ products }: { products: Product[] }) {
             >
               <Link href={`/product/${prod.slug}`} className="group block bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-white/30 transition-colors">
                 <div className="aspect-square bg-white relative">
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={prod.images[0]}
                     alt={prod.name}
-                    fill
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                    className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute top-4 left-4 flex flex-col gap-2">
                      {prod.tags && prod.tags.map(tag => (

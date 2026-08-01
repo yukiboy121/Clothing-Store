@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
@@ -31,12 +30,11 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
       className="group bg-[#0A0A0A] border border-white/5 rounded-xl overflow-hidden flex flex-col"
     >
       <Link href={`/product/${product.slug}`} className="block relative aspect-square bg-white overflow-hidden">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={product.images[imageIndex] || product.images[0]}
           alt={product.name}
-          fill
-          className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
-          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+          className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
         />
 
         {/* Badges */}
