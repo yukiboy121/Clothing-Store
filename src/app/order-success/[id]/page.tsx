@@ -183,8 +183,8 @@ export default function OrderSuccessPage({ params }: { params: Promise<{ id: str
         {/* Printable Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 border-b border-white/10 mb-6 gap-4">
           <div>
-            <h2 className="font-heading text-2xl tracking-wider text-white">UNTERGRUND</h2>
-            <p className="text-xs text-white/50 print:text-gray-600">UNTERGRUND Official Order Invoice</p>
+            <h2 className="font-heading text-2xl tracking-wider text-white">DRAGON GROUP LK</h2>
+            <p className="text-xs text-white/50 print:text-gray-600">Official Order Invoice</p>
           </div>
           <div className="text-left md:text-right">
             <p className="text-xs font-bold text-white uppercase tracking-widest">
