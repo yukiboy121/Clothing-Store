@@ -1,84 +1,180 @@
+"use client";
+
+import { motion } from "framer-motion";
 import Link from "next/link";
-import { Wrench, Printer, Scissors, Layers, CheckCircle } from "lucide-react";
+
+const services = [
+  {
+    category: "Customization",
+    title: "DTF PRINTING",
+    description: "Experience high-vibrancy Direct to Film (DTF) printing for complex designs and multi-color logos. Perfect for t-shirts, hoodies, and activewear with no minimum order quantity.",
+    features: ["Vibrant Colors", "Durable Finish", "No MOQ", "Fast Turnaround"],
+    action: "Get a Quote",
+  },
+  {
+    category: "Customization",
+    title: "PROFESSIONAL EMBROIDERY",
+    description: "Elevate your brand with premium precision stitching. We provide high-quality embroidery for caps, polos, jackets, and corporate wear with exceptional detail.",
+    features: ["High Precision", "Premium Thread", "Long Lasting", "Professional Look"],
+    action: "Get a Quote",
+  },
+  {
+    category: "Digital Presence",
+    title: "WEB DESIGN & E-COMMERCE",
+    description: "We build professional, conversion-optimized e-commerce websites tailored for your business. From hosting to payment gateway integration, we handle it all.",
+    features: ["100% Responsive", "SEO Optimized", "Payment Gateway", "24/7 Support"],
+    action: "Inquire Now",
+  },
+  {
+    category: "Creative",
+    title: "PRODUCT PHOTOGRAPHY",
+    description: "High-end editorial and catalog photography to make your products stand out. Professional lighting and post-production included.",
+    features: ["Studio Lighting", "High Res", "Editorial Style", "Fast Delivery"],
+    action: "Book Session",
+  },
+  {
+    category: "Business Growth",
+    title: "RESELLING PARTNERSHIP",
+    description: "Join our network of successful resellers. We provide high-quality products, reliable fulfillment, and the support you need to grow your own apparel business.",
+    features: ["Wholesale Pricing", "Quality Assurance", "Bulk Discounts", "Priority Support"],
+    action: "Learn More",
+  },
+];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.25, 0.1, 0.25, 1],
+    }
+  },
+};
 
 export default function ServicesPage() {
-  const services = [
-    {
-      title: "Custom Printing",
-      description: "High-quality screen printing, DTF, and sublimation tailored for your brand.",
-      icon: <Printer size={32} className="text-white" />,
-    },
-    {
-      title: "Cut & Sew",
-      description: "We manufacture premium garments from scratch, custom tailored to your exact measurements.",
-      icon: <Scissors size={32} className="text-white" />,
-    },
-    {
-      title: "Bulk Orders",
-      description: "Specialized discounts and expedited processing for corporate and event bulk orders.",
-      icon: <Layers size={32} className="text-white" />,
-    },
-    {
-      title: "Brand Development",
-      description: "Private labeling, custom tags, and packaging to elevate your clothing brand.",
-      icon: <Wrench size={32} className="text-white" />,
-    }
-  ];
+  const whatsappNumber = "94770000000"; // Can be updated to the real number
 
   return (
-    <div className="min-h-screen pt-36 pb-24 bg-void text-white">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        {/* Header Section */}
-        <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <span className="text-white/60 text-xs font-bold uppercase tracking-[0.3em]">Services</span>
-          <h1 className="text-5xl md:text-7xl font-heading mt-4 mb-6 uppercase tracking-wider">Premium Custom Apparel</h1>
-          <p className="text-white/60 max-w-2xl mx-auto text-sm md:text-base">
-            We provide end-to-end manufacturing and printing services for individuals and brands across Sri Lanka.
-          </p>
-        </div>
+    <div className="min-h-screen pt-32 pb-24 px-6 md:px-12 max-w-[1600px] mx-auto text-white">
+      {/* Hero Section */}
+      <div className="mb-16 md:mb-24 text-center md:text-left max-w-4xl">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-[10px] md:text-xs text-white/50 tracking-[0.3em] uppercase mb-4"
+        >
+          Beyond Apparel
+        </motion.p>
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="font-heading text-4xl md:text-6xl lg:text-7xl tracking-wider leading-[1.1] text-white"
+        >
+          OUR EXPERT <span className="text-white/40">SERVICES</span>
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-6 text-sm md:text-base text-white/60 max-w-2xl leading-relaxed"
+        >
+          Dragon Group brings a number of premium services to elevate your brand and e-commerce business. From custom apparel manufacturing to high-end digital presence.
+        </motion.p>
+      </div>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
-          {services.map((service, index) => (
-            <div 
-              key={index}
-              className="bg-abyss border border-white/5 p-8 lg:p-12 rounded-2xl hover:border-white/30 transition-all group"
-            >
-              <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                {service.icon}
-              </div>
-              <h3 className="text-2xl font-bold mb-4 uppercase tracking-wider">{service.title}</h3>
-              <p className="text-white/60 leading-relaxed">
+      {/* Services Grid */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8"
+      >
+        {services.map((service) => (
+          <motion.div
+            key={service.title}
+            variants={cardVariants}
+            className="group relative h-full flex flex-col liquid-glass p-8 md:p-10 hover:-translate-y-2 transition-transform duration-500 ease-out"
+          >
+            {/* Subtle Glow on Hover */}
+            <div className="absolute inset-0 bg-white/0 group-hover:bg-white/[0.02] transition-colors duration-500 pointer-events-none rounded-xl"></div>
+            
+            <div className="flex-grow z-10">
+              <p className="text-[10px] tracking-[0.2em] text-white/40 uppercase mb-4">
+                {service.category}
+              </p>
+              <h2 className="font-heading text-2xl md:text-3xl tracking-wider text-white mb-4">
+                {service.title}
+              </h2>
+              <p className="text-xs text-white/60 leading-relaxed mb-8">
                 {service.description}
               </p>
-            </div>
-          ))}
-        </div>
 
-        {/* CTA Section */}
-        <div className="mt-24 bg-abyss border border-white/10 p-10 lg:p-16 rounded-3xl text-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-50"></div>
-          
-          <h2 className="text-3xl md:text-5xl font-heading uppercase tracking-wider mb-6">Start Your Project Today</h2>
-          <p className="text-white/70 mb-10 max-w-xl mx-auto">
-            Ready to bring your clothing brand to life? Contact our production team for a free consultation and quote.
+              <div className="grid grid-cols-2 gap-4 mb-10">
+                {service.features.map((feature, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/30 shrink-0">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span className="text-[10px] tracking-wider text-white/50 uppercase">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-auto pt-6 border-t border-white/10 z-10">
+              <a
+                href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Hello! I would like to ${service.action.toLowerCase()} for ${service.title}.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-4 font-heading text-xs tracking-[0.2em] bg-transparent border border-white/20 text-white hover:border-white/60 hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center gap-3 uppercase"
+              >
+                {service.action}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+            </div>
+          </motion.div>
+        ))}
+
+        {/* Contact Banner (Takes up remaining space in grid) */}
+        <motion.div
+          variants={cardVariants}
+          className="group relative h-full flex flex-col justify-center items-center text-center liquid-glass p-8 md:p-10 border border-white/5 bg-white/[0.02]"
+        >
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-white/40 mb-6">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <h2 className="font-heading text-2xl tracking-wider text-white mb-3">
+            NEED A CUSTOM SOLUTION?
+          </h2>
+          <p className="text-xs text-white/50 mb-8 max-w-[250px]">
+            Have a unique project in mind? Contact us directly to discuss your requirements.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/contact"
-              className="px-8 py-4 bg-white text-black font-bold uppercase tracking-[0.2em] text-sm hover:bg-white/80 transition-colors rounded-none"
-            >
-              Request a Quote
-            </Link>
-            <Link 
-              href="/shop"
-              className="px-8 py-4 bg-transparent border border-white/20 text-white font-bold uppercase tracking-[0.2em] text-sm hover:bg-white/5 transition-colors rounded-none"
-            >
-              View Blank Apparel
-            </Link>
-          </div>
-        </div>
-      </div>
+          <Link
+            href="/contact"
+            className="px-8 py-4 bg-white text-black font-semibold text-xs tracking-widest uppercase rounded-xl hover:bg-neutral-200 transition-colors"
+          >
+            CONTACT US
+          </Link>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
