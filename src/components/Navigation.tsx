@@ -41,7 +41,7 @@ export function Navigation() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-4 liquid-glass"
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-4 nav-glass"
       >
         <div className="max-w-[1800px] mx-auto px-6 md:px-10 flex items-center justify-between">
           {/* Mobile Menu Button */}
